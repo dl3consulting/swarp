@@ -43,13 +43,13 @@ Sprites bootstrap a runner binary automatically during `swarm_deploy`, but you c
 ```bash
 # linux/amd64
 curl -fsSL \
-  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-linux-amd64 \
+  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64 \
   -o swarp-runner
 chmod +x swarp-runner
 
 # linux/arm64
 curl -fsSL \
-  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-linux-arm64 \
+  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-arm64 \
   -o swarp-runner
 ```
 
@@ -87,14 +87,14 @@ Every `swarp-runner-*` artifact ships with a corresponding `.sig` file containin
 
 ```bash
 # download binary + signature
-curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-linux-amd64
-curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-linux-amd64.sig
+curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64
+curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64.sig
 
 # verify (replace <hex-public-key> with the SWARP release public key)
 openssl pkeyutl -verify \
   -pubin -inkey <hex-public-key>.pem \
-  -rawin -in swarp-runner-linux-amd64 \
-  -sigfile swarp-runner-linux-amd64.sig
+  -rawin -in swarp-runner-amd64 \
+  -sigfile swarp-runner-amd64.sig
 ```
 
 The public key is embedded in the runner binary itself at build time, so self-update rejects tampered releases without any external key distribution.
@@ -107,10 +107,10 @@ Each `v0.x.y` release on this repo contains:
 
 | File | What |
 |------|------|
-| `swarp-router-linux-{amd64,arm64}` | Router binary (you deploy this to Fly.io) |
-| `swarp-runner-linux-{amd64,arm64}` | Runner binary (lives on agent sprites) |
-| `swarp-runner-linux-{amd64,arm64}.sig` | ed25519 signature for the runner |
-| `swarp-slack-linux-{amd64,arm64}` | Slack bridge binary |
+| `swarp-router-{amd64,arm64}` | Router binary (you deploy this to Fly.io) |
+| `swarp-runner-{amd64,arm64}` | Runner binary (lives on agent sprites) |
+| `swarp-runner-{amd64,arm64}.sig` | ed25519 signature for the runner |
+| `swarp-slack-{amd64,arm64}` | Slack bridge binary |
 
 The CLI + MCP server are published separately as `@swarp/cli` on npm with the matching version.
 
