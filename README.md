@@ -10,12 +10,27 @@
 
 ## What you get
 
-- **Router** — gRPC server that you deploy to Fly.io. Agents open long-lived bidi streams to it; your local Claude Code session dispatches tasks through it.
+- **Router** — gRPC server you deploy to Fly.io. Agents open long-lived bidi streams to it; your local Claude Code session dispatches tasks through it.
 - **Runner** — the binary that lives on every agent sprite. Connects to the router, executes Claude sessions, and self-updates from this repo.
 - **Slack** — optional bridge that lets a Slack workspace trigger agents.
 - **`@swarp/cli` npm package** — the Claude Code MCP server, onboarding flow, deploy tooling, and agent YAML generator. Published to public npm on every release.
 
 All three binaries are statically-linked Go (no runtime deps), signed with ed25519, and downloadable unauthenticated from [Releases](https://github.com/dl3consulting/swarp/releases).
+
+---
+
+## Prerequisites
+
+Before you start, install and authenticate:
+
+| Tool | Install | Auth |
+|------|---------|------|
+| **Claude Code** | https://claude.com/claude-code | `claude login` |
+| **flyctl** | `curl -L https://fly.io/install.sh \| sh` | `fly auth login` |
+| **sprite** | `curl -fsSL https://sprites.dev/install.sh \| sh` | `sprite auth login` |
+| **gh** | https://cli.github.com | `gh auth login` |
+
+Fly.io account on any paid plan (router is ~$2/mo at the default 256MB shared CPU).
 
 ---
 
@@ -27,7 +42,7 @@ All three binaries are statically-linked Go (no runtime deps), signed with ed255
 claude plugin add swarp
 ```
 
-Then restart Claude Code. Type `/swarp` in any session to start onboarding. This installs the MCP server, skills, and hooks.
+Then restart Claude Code. Type `/swarp` in any session to start onboarding.
 
 ### Option 2 — npm directly
 
@@ -36,48 +51,144 @@ npm install -g @swarp/cli
 swarp --help
 ```
 
-### Option 3 — Runner binary (for sprites)
+---
 
-Sprites bootstrap a runner binary automatically during `swarm_deploy`, but you can also fetch it directly:
+## Quickstart — your first agent in ~10 minutes
 
-```bash
-# linux/amd64
-curl -fsSL \
-  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64 \
-  -o swarp-runner
-chmod +x swarp-runner
+### 1. Onboard (one time, ~5 min)
 
-# linux/arm64
-curl -fsSL \
-  https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-arm64 \
-  -o swarp-runner
+In Claude Code:
+
+```
+/swarp
 ```
 
-Once running, it self-updates on restart from the latest release in this repo (semver-major compatible, signature-verified).
+The skill walks you through four phases, prompting for decisions at each step:
+
+1. **Prerequisites** — verifies flyctl, sprite, gh are installed and authenticated.
+2. **Router** — deploys the gRPC router to your Fly.io org. Shows a cost estimate (~$2/mo) and waits for approval before creating infrastructure.
+3. **Secrets** — guides you through setting the GitHub + Fly API tokens that CI and the deploy flow need.
+4. **First agent** — creates an agent config.
+
+At the end you'll have a `.swarp.json` in your repo root with the router URL and org config, plus whatever agent you created in step 4.
+
+### 2. Provision a second agent
+
+Agent configs live in `apps/swarp/agents/<name>/`. For each agent:
+
+- `agent.yaml` — committed. Describes the persona and the modes the agent can run.
+- `.env` — gitignored. Holds the agent's `CLAUDE_CODE_OAUTH_TOKEN` + `GH_TOKEN`.
+
+Minimal `agent.yaml`:
+
+```yaml
+name: dominic
+version: '1.0.0'
+grpc_port: 50052
+router_url: '${SWARP_ROUTER_URL}'
+
+preamble: |
+  You are Dominic Vargas, a no-nonsense backend engineer. Respond
+  concisely, like a senior engineer in Slack.
+
+modes:
+  - name: chat
+    description: 'Social conversation using persona'
+    model: claude-haiku-4-5-20251001
+    max_turns: 1
+    timeout_minutes: 2
+    prompt: |
+      You are Dominic Vargas. Respond to: {{ message }}
+      One or two sentences. {"response":"<your reply>"}
+    allowed_tools: []
+
+env:
+  secrets:
+    - GH_TOKEN
+    - CLAUDE_CODE_OAUTH_TOKEN
+  network:
+    internet: true
+```
+
+Then provision:
+
+```bash
+./apps/swarp/agents/provision.sh dominic
+```
+
+The script is idempotent — safe to re-run. It creates the sprite, injects secrets, writes Claude credentials, installs the runner binary, sets up the WireGuard tunnel to the router, pushes `agent.yaml`, and starts the runner. Takes about 90 seconds.
+
+### 3. Send the agent a task
+
+From Claude Code, once the agent is connected:
+
+```
+> Send Dominic a chat message: "What did you break this morning?"
+```
+
+The MCP server turns that into a gRPC dispatch to your router, which routes it to dominic's runner, which runs a real Claude session with the persona prompt.
+
+Or skip the conversational layer and dispatch directly:
+
+```bash
+node apps/swarp/npm/scripts/run-dispatch.mjs dominic chat "message=what did you break this morning?"
+```
 
 ---
 
-## Quick start
+## Troubleshooting
+
+### `dispatch failed: ... 5 NOT_FOUND`
+
+The agent isn't connected to the router.
 
 ```bash
-# 1. Sign in at swarp.dev (OAuth)
-claude
-> /swarp
+# Check what the router sees
+/swarp status
 
-# The /swarp skill walks you through 4 phases:
-#   1. Prerequisites — flyctl, sprite, gh CLIs
-#   2. Router — deploy the gRPC router to your Fly.io org (~$2/mo)
-#   3. Secrets — set GitHub + Fly API tokens
-#   4. First agent — create agents/<name>/agent.yaml and deploy
+# If the agent is offline, re-provision:
+./apps/swarp/agents/provision.sh <agent>
+
+# Or restart the runner manually:
+sprite -s <agent> exec sh -- -c '
+  pkill -x swarp-runner
+  setsid nohup /home/sprite/start-runner.sh > /home/sprite/swarp-runner.log 2>&1 < /dev/null &
+'
+sprite -s <agent> exec tail /home/sprite/swarp-runner.log
 ```
 
-Once an agent is deployed, dispatch tasks from Claude Code:
+### `dispatch failed: ... 14 UNAVAILABLE`
 
-```
-> Run a task on tess: write a blog post about Fly Sprites
+The sprite can't reach the router over the private net. Check the wireguard tunnel:
+
+```bash
+sprite -s <agent> exec ip addr show wg0
+# If wg0 is missing or down:
+./apps/swarp/agents/provision.sh <agent>   # re-establishes the peer
 ```
 
-The MCP server turns that into a gRPC call to your router, which routes it to the `tess` sprite's runner, which runs the task in a real Claude session with full tool access.
+### `dispatch failed: ... 8 RESOURCE_EXHAUSTED`
+
+The agent is already handling a task. Wait, or cancel. If it's been stuck more than a few minutes, the router's in-flight task tracking may be wedged — `fly machine restart <router-id> --app swarp-router` clears it.
+
+### `Not logged in · Please run /login` on the agent
+
+Claude auth didn't land on the sprite. Re-run the provision script — it writes `~/.claude/.credentials.json` idempotently from the OAuth token in `agents/<name>/.env`.
+
+### flyctl wireguard create hangs
+
+Delete any stale local config file first:
+
+```bash
+rm -f /tmp/<agent>.conf
+flyctl wireguard create dl3-consulting dfw <agent> /tmp/<agent>.conf --debug
+```
+
+`--debug` surfaces real errors in under a second; without it, flyctl can retry-loop silently.
+
+### wg-quick fails with `resolvconf: command not found`
+
+Strip the `DNS =` line from the generated `.conf` before pushing to the sprite. The current Ubuntu sprite image doesn't ship `resolvconf`. `provision.sh` already handles this.
 
 ---
 
@@ -86,15 +197,8 @@ The MCP server turns that into a gRPC call to your router, which routes it to th
 Every `swarp-runner-*` artifact ships with a corresponding `.sig` file containing an ed25519 signature over the binary contents. The runner verifies its own updates; you can verify manually too:
 
 ```bash
-# download binary + signature
 curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64
 curl -fsSL -O https://github.com/dl3consulting/swarp/releases/latest/download/swarp-runner-amd64.sig
-
-# verify (replace <hex-public-key> with the SWARP release public key)
-openssl pkeyutl -verify \
-  -pubin -inkey <hex-public-key>.pem \
-  -rawin -in swarp-runner-amd64 \
-  -sigfile swarp-runner-amd64.sig
 ```
 
 The public key is embedded in the runner binary itself at build time, so self-update rejects tampered releases without any external key distribution.
@@ -121,7 +225,7 @@ The CLI + MCP server are published separately as `@swarp/cli` on npm with the ma
 - No code is committed here. Source lives in a private monorepo; this repo exists to host unauthenticated-downloadable release artifacts so sprites anywhere on the public internet can self-update.
 - GitHub Actions is **disabled** on this repo. There is no workflow attack surface. Releases are pushed by a scoped PAT from the source-of-truth monorepo's CI.
 - Tag protection prevents `v*` tag deletion, update, and force-push.
-- Branch protection requires signed commits and PR review on `main`.
+- Branch protection requires PR review on `main`.
 
 Found a vulnerability? Email andrew@kunzel.io (please don't open a public issue).
 
