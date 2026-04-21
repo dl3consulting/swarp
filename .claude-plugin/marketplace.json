@@ -1,15 +1,6 @@
 {
   "name": "swarp",
-  "owner": {
-    "name": "DL3 Consulting",
-    "email": "andrew@kunzel.io"
-  },
+  "owner": { "name": "DL3 Consulting", "email": "andrew@kunzel.io" },
   "description": "SWARP agent orchestration platform",
-  "plugins": [
-    {
-      "name": "swarp",
-      "description": "Deploy remote Claude agents with guided onboarding, cost confirmation, and gRPC dispatch",
-      "source": "./"
-    }
-  ]
+  "plugins": [{ "name": "swarp", "description": "Deploy remote Claude agents with guided onboarding, cost confirmation, and gRPC dispatch", "source": "./" }]
 }
