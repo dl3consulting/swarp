@@ -1,0 +1,12 @@
+{
+  "name": "swarp",
+  "version": "0.1.35",
+  "description": "Agent orchestration platform — deploy remote Claude agents",
+  "author": {
+    "name": "DL3 Consulting",
+    "email": "andrew@kunzel.io"
+  },
+  "repository": "https://github.com/dl3consulting/swarp",
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
+}
