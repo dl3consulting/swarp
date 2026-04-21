@@ -2,7 +2,7 @@
 
 **Agent orchestration for Claude Code.** Deploy remote Claude agents on Fly Sprites, orchestrated through a central gRPC router you own.
 
-> This repository hosts the signed public release artifacts. Source lives in a private monorepo. Releases here include the `router`, `runner`, and `slack` binaries for Linux (amd64 + arm64) along with their ed25519 signatures.
+> This repository hosts the Claude Code plugin and signed release binaries. Source lives in a private monorepo.
 
 🌐 https://swarp.dev
 
@@ -13,7 +13,7 @@
 - **Router** — gRPC server you deploy to Fly.io. Agents open long-lived bidi streams to it; your local Claude Code session dispatches tasks through it.
 - **Runner** — the binary that lives on every agent sprite. Connects to the router, executes Claude sessions, and self-updates from this repo.
 - **Slack** — optional bridge that lets a Slack workspace trigger agents.
-- **`@swarp/cli` npm package** — the Claude Code MCP server, onboarding flow, deploy tooling, and agent YAML generator. Published to public npm on every release.
+- **Claude Code plugin** — MCP server, onboarding flow, deploy tooling, and agent YAML generator. Distributed from this repo as a Claude Code plugin.
 
 All three binaries are statically-linked Go (no runtime deps), signed with ed25519, and downloadable unauthenticated from [Releases](https://github.com/dl3consulting/swarp/releases).
 
@@ -36,19 +36,19 @@ Fly.io account on any paid plan (router is ~$2/mo at the default 256MB shared CP
 
 ## Install
 
-### Option 1 — Claude Code plugin (recommended)
+### Claude Code plugin (recommended)
 
 ```bash
-claude plugin add swarp
+claude plugins marketplace add dl3consulting/swarp
+claude plugins install swarp@swarp
 ```
 
-Then restart Claude Code. Type `/swarp` in any session to start onboarding.
+Restart Claude Code. Type `/swarp` in any session to start onboarding.
 
-### Option 2 — npm directly
+To update:
 
 ```bash
-npm install -g @swarp/cli
-swarp --help
+claude plugins update swarp@swarp
 ```
 
 ---
@@ -216,13 +216,13 @@ Each `v0.x.y` release on this repo contains:
 | `swarp-runner-{amd64,arm64}.sig` | ed25519 signature for the runner |
 | `swarp-slack-{amd64,arm64}` | Slack bridge binary |
 
-The CLI + MCP server are published separately as `@swarp/cli` on npm with the matching version.
+The CLI + MCP server are distributed as a Claude Code plugin from this repo (also published as `@swarp/cli` on npm).
 
 ---
 
 ## Security
 
-- No code is committed here. Source lives in a private monorepo; this repo exists to host unauthenticated-downloadable release artifacts so sprites anywhere on the public internet can self-update.
+- Source lives in a private monorepo. This repo hosts the built plugin files and unauthenticated-downloadable release artifacts so sprites anywhere on the public internet can self-update.
 - GitHub Actions is **disabled** on this repo. There is no workflow attack surface. Releases are pushed by a scoped PAT from the source-of-truth monorepo's CI.
 - Tag protection prevents `v*` tag deletion, update, and force-push.
 - Branch protection requires PR review on `main`.
