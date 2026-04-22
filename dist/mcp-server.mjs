@@ -42164,18 +42164,17 @@ var protoLoader = __toESM(require_src4(), 1);
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "url";
 import path from "path";
-function findPackageRoot(startDir) {
+var PROTO_REL = "proto/swarp/v1/swarp.proto";
+function findProtoPath(startDir) {
   let dir = startDir;
   while (dir !== path.dirname(dir)) {
-    if (existsSync(path.join(dir, "package.json"))) return dir;
+    const candidate = path.join(dir, PROTO_REL);
+    if (existsSync(candidate)) return candidate;
     dir = path.dirname(dir);
   }
-  return startDir;
+  return path.resolve(startDir, PROTO_REL);
 }
-var PROTO_PATH = path.resolve(
-  findPackageRoot(path.dirname(fileURLToPath(import.meta.url))),
-  "proto/swarp/v1/swarp.proto"
-);
+var PROTO_PATH = findProtoPath(path.dirname(fileURLToPath(import.meta.url)));
 var LOADER_OPTIONS = {
   keepCase: true,
   longs: String,
