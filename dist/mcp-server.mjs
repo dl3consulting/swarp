@@ -8479,8 +8479,8 @@ var require_picker = __commonJS({
       PickResultType2[PickResultType2["DROP"] = 3] = "DROP";
     })(PickResultType || (exports2.PickResultType = PickResultType = {}));
     var UnavailablePicker = class {
-      constructor(status) {
-        this.status = Object.assign({ code: constants_1.Status.UNAVAILABLE, details: "No connection established", metadata: new metadata_1.Metadata() }, status);
+      constructor(status2) {
+        this.status = Object.assign({ code: constants_1.Status.UNAVAILABLE, details: "No connection established", metadata: new metadata_1.Metadata() }, status2);
       }
       pick(pickArgs) {
         return {
@@ -10115,13 +10115,13 @@ var require_call = __commonJS({
     var events_1 = __require("events");
     var stream_1 = __require("stream");
     var constants_1 = require_constants();
-    function callErrorFromStatus(status, callerStack) {
-      const message = `${status.code} ${constants_1.Status[status.code]}: ${status.details}`;
+    function callErrorFromStatus(status2, callerStack) {
+      const message = `${status2.code} ${constants_1.Status[status2.code]}: ${status2.details}`;
       const error2 = new Error(message);
       const stack = `${error2.stack}
 for call at
 ${callerStack}`;
-      return Object.assign(new Error(message), status, { stack });
+      return Object.assign(new Error(message), status2, { stack });
     }
     var ClientUnaryCallImpl = class extends events_1.EventEmitter {
       constructor() {
@@ -10312,8 +10312,8 @@ var require_call_interface = __commonJS({
           }
         });
       }
-      onReceiveStatus(status) {
-        this.listener.onReceiveStatus(status, (processedStatus) => {
+      onReceiveStatus(status2) {
+        this.listener.onReceiveStatus(status2, (processedStatus) => {
           if (this.processingMetadata || this.processingMessage) {
             this.pendingStatus = processedStatus;
           } else {
@@ -10412,8 +10412,8 @@ var require_client_interceptors = __commonJS({
       onReceiveMessage: (message, next) => {
         next(message);
       },
-      onReceiveStatus: (status, next) => {
-        next(status);
+      onReceiveStatus: (status2, next) => {
+        next(status2);
       }
     };
     var defaultRequester = {
@@ -10449,9 +10449,9 @@ var require_client_interceptors = __commonJS({
           this.requester = defaultRequester;
         }
       }
-      cancelWithStatus(status, details) {
+      cancelWithStatus(status2, details) {
         this.requester.cancel(() => {
-          this.nextCall.cancelWithStatus(status, details);
+          this.nextCall.cancelWithStatus(status2, details);
         });
       }
       getPeer() {
@@ -10476,7 +10476,7 @@ var require_client_interceptors = __commonJS({
           }),
           onReceiveMessage: (_d = (_c = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveMessage) === null || _c === void 0 ? void 0 : _c.bind(interceptingListener)) !== null && _d !== void 0 ? _d : ((message) => {
           }),
-          onReceiveStatus: (_f = (_e = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveStatus) === null || _e === void 0 ? void 0 : _e.bind(interceptingListener)) !== null && _f !== void 0 ? _f : ((status) => {
+          onReceiveStatus: (_f = (_e = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveStatus) === null || _e === void 0 ? void 0 : _e.bind(interceptingListener)) !== null && _f !== void 0 ? _f : ((status2) => {
           })
         };
         this.processingMetadata = true;
@@ -10552,8 +10552,8 @@ var require_client_interceptors = __commonJS({
         this.call = call;
         this.methodDefinition = methodDefinition;
       }
-      cancelWithStatus(status, details) {
-        this.call.cancelWithStatus(status, details);
+      cancelWithStatus(status2, details) {
+        this.call.cancelWithStatus(status2, details);
       }
       getPeer() {
         return this.call.getPeer();
@@ -10596,12 +10596,12 @@ var require_client_interceptors = __commonJS({
             }
             (_a = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveMessage) === null || _a === void 0 ? void 0 : _a.call(interceptingListener, deserialized);
           },
-          onReceiveStatus: (status) => {
+          onReceiveStatus: (status2) => {
             var _a, _b;
             if (readError) {
               (_a = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveStatus) === null || _a === void 0 ? void 0 : _a.call(interceptingListener, readError);
             } else {
-              (_b = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveStatus) === null || _b === void 0 ? void 0 : _b.call(interceptingListener, status);
+              (_b = interceptingListener === null || interceptingListener === void 0 ? void 0 : interceptingListener.onReceiveStatus) === null || _b === void 0 ? void 0 : _b.call(interceptingListener, status2);
             }
           }
         });
@@ -10633,12 +10633,12 @@ var require_client_interceptors = __commonJS({
             receivedMessage = true;
             (_a2 = listener === null || listener === void 0 ? void 0 : listener.onReceiveMessage) === null || _a2 === void 0 ? void 0 : _a2.call(listener, message);
           },
-          onReceiveStatus: (status) => {
+          onReceiveStatus: (status2) => {
             var _a2, _b2;
             if (!receivedMessage) {
               (_a2 = listener === null || listener === void 0 ? void 0 : listener.onReceiveMessage) === null || _a2 === void 0 ? void 0 : _a2.call(listener, null);
             }
-            (_b2 = listener === null || listener === void 0 ? void 0 : listener.onReceiveStatus) === null || _b2 === void 0 ? void 0 : _b2.call(listener, status);
+            (_b2 = listener === null || listener === void 0 ? void 0 : listener.onReceiveStatus) === null || _b2 === void 0 ? void 0 : _b2.call(listener, status2);
           }
         };
         super.start(metadata, wrapperListener);
@@ -10817,28 +10817,28 @@ var require_client = __commonJS({
             }
             responseMessage = message;
           },
-          onReceiveStatus(status) {
+          onReceiveStatus(status2) {
             if (receivedStatus) {
               return;
             }
             receivedStatus = true;
-            if (status.code === constants_1.Status.OK) {
+            if (status2.code === constants_1.Status.OK) {
               if (responseMessage === null) {
                 const callerStack = getErrorStackString(callerStackError);
                 callProperties.callback((0, call_1.callErrorFromStatus)({
                   code: constants_1.Status.UNIMPLEMENTED,
                   details: "No message received",
-                  metadata: status.metadata
+                  metadata: status2.metadata
                 }, callerStack));
               } else {
                 callProperties.callback(null, responseMessage);
               }
             } else {
               const callerStack = getErrorStackString(callerStackError);
-              callProperties.callback((0, call_1.callErrorFromStatus)(status, callerStack));
+              callProperties.callback((0, call_1.callErrorFromStatus)(status2, callerStack));
             }
             callerStackError = null;
-            emitter.emit("status", status);
+            emitter.emit("status", status2);
           }
         });
         call.sendMessage(argument);
@@ -10890,28 +10890,28 @@ var require_client = __commonJS({
             responseMessage = message;
             call.startRead();
           },
-          onReceiveStatus(status) {
+          onReceiveStatus(status2) {
             if (receivedStatus) {
               return;
             }
             receivedStatus = true;
-            if (status.code === constants_1.Status.OK) {
+            if (status2.code === constants_1.Status.OK) {
               if (responseMessage === null) {
                 const callerStack = getErrorStackString(callerStackError);
                 callProperties.callback((0, call_1.callErrorFromStatus)({
                   code: constants_1.Status.UNIMPLEMENTED,
                   details: "No message received",
-                  metadata: status.metadata
+                  metadata: status2.metadata
                 }, callerStack));
               } else {
                 callProperties.callback(null, responseMessage);
               }
             } else {
               const callerStack = getErrorStackString(callerStackError);
-              callProperties.callback((0, call_1.callErrorFromStatus)(status, callerStack));
+              callProperties.callback((0, call_1.callErrorFromStatus)(status2, callerStack));
             }
             callerStackError = null;
-            emitter.emit("status", status);
+            emitter.emit("status", status2);
           }
         });
         return emitter;
@@ -10976,18 +10976,18 @@ var require_client = __commonJS({
           onReceiveMessage(message) {
             stream.push(message);
           },
-          onReceiveStatus(status) {
+          onReceiveStatus(status2) {
             if (receivedStatus) {
               return;
             }
             receivedStatus = true;
             stream.push(null);
-            if (status.code !== constants_1.Status.OK) {
+            if (status2.code !== constants_1.Status.OK) {
               const callerStack = getErrorStackString(callerStackError);
-              stream.emit("error", (0, call_1.callErrorFromStatus)(status, callerStack));
+              stream.emit("error", (0, call_1.callErrorFromStatus)(status2, callerStack));
             }
             callerStackError = null;
-            stream.emit("status", status);
+            stream.emit("status", status2);
           }
         });
         call.sendMessage(argument);
@@ -11032,18 +11032,18 @@ var require_client = __commonJS({
           onReceiveMessage(message) {
             stream.push(message);
           },
-          onReceiveStatus(status) {
+          onReceiveStatus(status2) {
             if (receivedStatus) {
               return;
             }
             receivedStatus = true;
             stream.push(null);
-            if (status.code !== constants_1.Status.OK) {
+            if (status2.code !== constants_1.Status.OK) {
               const callerStack = getErrorStackString(callerStackError);
-              stream.emit("error", (0, call_1.callErrorFromStatus)(status, callerStack));
+              stream.emit("error", (0, call_1.callErrorFromStatus)(status2, callerStack));
             }
             callerStackError = null;
-            stream.emit("status", status);
+            stream.emit("status", status2);
           }
         });
         return stream;
@@ -21115,8 +21115,8 @@ var require_filter = __commonJS({
       async receiveMessage(message) {
         return message;
       }
-      receiveTrailers(status) {
-        return status;
+      receiveTrailers(status2) {
+        return status2;
       }
     };
     exports2.BaseFilter = BaseFilter;
@@ -21519,8 +21519,8 @@ var require_filter_stack = __commonJS({
         }
         return result;
       }
-      receiveTrailers(status) {
-        let result = status;
+      receiveTrailers(status2) {
+        let result = status2;
         for (let i = this.filters.length - 1; i >= 0; i--) {
           result = this.filters[i].receiveTrailers(result);
         }
@@ -21602,12 +21602,12 @@ var require_single_subchannel_channel = __commonJS({
         }
         this.filterStack = filterStackFactory.createFilter();
       }
-      cancelWithStatus(status, details) {
+      cancelWithStatus(status2, details) {
         if (this.childCall) {
-          this.childCall.cancelWithStatus(status, details);
+          this.childCall.cancelWithStatus(status2, details);
         } else {
           this.pendingStatus = {
-            code: status,
+            code: status2,
             details,
             metadata: new metadata_1.Metadata()
           };
@@ -21658,8 +21658,8 @@ var require_single_subchannel_channel = __commonJS({
               listener.onReceiveStatus(this.pendingStatus);
             }
           },
-          onReceiveStatus: async (status) => {
-            const filteredStatus = await this.filterStack.receiveTrailers(status);
+          onReceiveStatus: async (status2) => {
+            const filteredStatus = await this.filterStack.receiveTrailers(status2);
             if (this.readFilterPending) {
               this.pendingStatus = filteredStatus;
             } else {
@@ -21988,8 +21988,8 @@ var require_subchannel = __commonJS({
           this.callTracker.addCallStarted();
           this.streamTracker.addCallStarted();
           statsTracker = {
-            onCallEnd: (status) => {
-              if (status.code === constants_1.Status.OK) {
+            onCallEnd: (status2) => {
+              if (status2.code === constants_1.Status.OK) {
                 this.callTracker.addCallSucceeded();
               } else {
                 this.callTracker.addCallFailed();
@@ -22941,9 +22941,9 @@ var require_subchannel_call = __commonJS({
        * Subsequent calls are no-ops.
        * @param status The status of the call.
        */
-      endCall(status) {
+      endCall(status2) {
         if (this.finalStatus === null || this.finalStatus.code === constants_1.Status.OK) {
-          this.finalStatus = status;
+          this.finalStatus = status2;
           this.maybeOutputStatus();
         }
         this.destroyHttp2Stream();
@@ -22992,7 +22992,7 @@ var require_subchannel_call = __commonJS({
           metadata = new metadata_1.Metadata();
         }
         const metadataMap = metadata.getMap();
-        let status;
+        let status2;
         if (typeof metadataMap["grpc-status"] === "string") {
           const receivedStatus = Number(metadataMap["grpc-status"]);
           this.trace("received status code " + receivedStatus + " from server");
@@ -23007,22 +23007,22 @@ var require_subchannel_call = __commonJS({
             metadata.remove("grpc-message");
             this.trace('received status details string "' + details + '" from server');
           }
-          status = {
+          status2 = {
             code: receivedStatus,
             details,
             metadata
           };
         } else if (this.httpStatusCode) {
-          status = mapHttpStatusCode(this.httpStatusCode);
-          status.metadata = metadata;
+          status2 = mapHttpStatusCode(this.httpStatusCode);
+          status2.metadata = metadata;
         } else {
-          status = {
+          status2 = {
             code: constants_1.Status.UNKNOWN,
             details: "No status information received",
             metadata
           };
         }
-        this.endCall(status);
+        this.endCall(status2);
       }
       destroyHttp2Stream() {
         var _a;
@@ -23042,9 +23042,9 @@ var require_subchannel_call = __commonJS({
           this.http2Stream.close(code);
         }
       }
-      cancelWithStatus(status, details) {
-        this.trace("cancelWithStatus code: " + status + ' details: "' + details + '"');
-        this.endCall({ code: status, details, metadata: new metadata_1.Metadata() });
+      cancelWithStatus(status2, details) {
+        this.trace("cancelWithStatus code: " + status2 + ' details: "' + details + '"');
+        this.endCall({ code: status2, details, metadata: new metadata_1.Metadata() });
       }
       getStatus() {
         return this.finalStatus;
@@ -23428,9 +23428,9 @@ var require_transport = __commonJS({
               this.lastMessageReceivedTimestamp = /* @__PURE__ */ new Date();
               (_a = subchannelCallStatsTracker.addMessageReceived) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker);
             },
-            onCallEnd: (status) => {
+            onCallEnd: (status2) => {
               var _a;
-              (_a = subchannelCallStatsTracker.onCallEnd) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker, status);
+              (_a = subchannelCallStatsTracker.onCallEnd) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker, status2);
               this.removeActiveCall(call);
             },
             onStreamEnd: (success) => {
@@ -23453,9 +23453,9 @@ var require_transport = __commonJS({
               var _a;
               (_a = subchannelCallStatsTracker.addMessageReceived) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker);
             },
-            onCallEnd: (status) => {
+            onCallEnd: (status2) => {
               var _a;
-              (_a = subchannelCallStatsTracker.onCallEnd) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker, status);
+              (_a = subchannelCallStatsTracker.onCallEnd) === null || _a === void 0 ? void 0 : _a.call(subchannelCallStatsTracker, status2);
               this.removeActiveCall(call);
             },
             onStreamEnd: (success) => {
@@ -23801,12 +23801,12 @@ var require_load_balancing_call = __commonJS({
       trace(text) {
         logging.trace(constants_1.LogVerbosity.DEBUG, TRACER_NAME, "[" + this.callNumber + "] " + text);
       }
-      outputStatus(status, progress) {
+      outputStatus(status2, progress) {
         var _a, _b;
         if (!this.ended) {
           this.ended = true;
-          this.trace("ended with status: code=" + status.code + ' details="' + status.details + '" start time=' + this.startTime.toISOString());
-          const finalStatus = Object.assign(Object.assign({}, status), { progress });
+          this.trace("ended with status: code=" + status2.code + ' details="' + status2.details + '" start time=' + this.startTime.toISOString());
+          const finalStatus = Object.assign(Object.assign({}, status2), { progress });
           (_a = this.listener) === null || _a === void 0 ? void 0 : _a.onReceiveStatus(finalStatus);
           (_b = this.onCallEnded) === null || _b === void 0 ? void 0 : _b.call(this, finalStatus.code, finalStatus.details, finalStatus.metadata);
         }
@@ -23859,12 +23859,12 @@ var require_load_balancing_call = __commonJS({
                     this.trace("Received message");
                     this.listener.onReceiveMessage(message);
                   },
-                  onReceiveStatus: (status) => {
+                  onReceiveStatus: (status2) => {
                     this.trace("Received status");
-                    if (status.rstCode === http2.constants.NGHTTP2_REFUSED_STREAM) {
-                      this.outputStatus(status, "REFUSED");
+                    if (status2.rstCode === http2.constants.NGHTTP2_REFUSED_STREAM) {
+                      this.outputStatus(status2, "REFUSED");
                     } else {
-                      this.outputStatus(status, "PROCESSED");
+                      this.outputStatus(status2, "PROCESSED");
                     }
                   }
                 });
@@ -23919,11 +23919,11 @@ var require_load_balancing_call = __commonJS({
             this.channel.queueCallForPick(this);
         }
       }
-      cancelWithStatus(status, details) {
+      cancelWithStatus(status2, details) {
         var _a;
-        this.trace("cancelWithStatus code: " + status + ' details: "' + details + '"');
-        (_a = this.child) === null || _a === void 0 ? void 0 : _a.cancelWithStatus(status, details);
-        this.outputStatus({ code: status, details, metadata: new metadata_1.Metadata() }, "PROCESSED");
+        this.trace("cancelWithStatus code: " + status2 + ' details: "' + details + '"');
+        (_a = this.child) === null || _a === void 0 ? void 0 : _a.cancelWithStatus(status2, details);
+        this.outputStatus({ code: status2, details, metadata: new metadata_1.Metadata() }, "PROCESSED");
       }
       getPeer() {
         var _a, _b;
@@ -24074,14 +24074,14 @@ var require_resolving_call = __commonJS({
           }
         }
       }
-      outputStatus(status) {
+      outputStatus(status2) {
         if (!this.ended) {
           this.ended = true;
           if (!this.filterStack) {
             this.filterStack = this.filterStackFactory.createFilter();
           }
           clearTimeout(this.deadlineTimer);
-          const filteredStatus = this.filterStack.receiveTrailers(status);
+          const filteredStatus = this.filterStack.receiveTrailers(status2);
           this.trace("ended with status: code=" + filteredStatus.code + ' details="' + filteredStatus.details + '"');
           this.statusWatchers.forEach((watcher) => watcher(filteredStatus));
           process.nextTick(() => {
@@ -24102,8 +24102,8 @@ var require_resolving_call = __commonJS({
           if (this.pendingHalfClose) {
             child.halfClose();
           }
-        }, (status) => {
-          this.cancelWithStatus(status.code, status.details);
+        }, (status2) => {
+          this.cancelWithStatus(status2.code, status2.details);
         });
       }
       getConfig() {
@@ -24164,16 +24164,16 @@ var require_resolving_call = __commonJS({
                 if (this.pendingChildStatus) {
                   this.outputStatus(this.pendingChildStatus);
                 }
-              }, (status) => {
-                this.cancelWithStatus(status.code, status.details);
+              }, (status2) => {
+                this.cancelWithStatus(status2.code, status2.details);
               });
             },
-            onReceiveStatus: (status) => {
+            onReceiveStatus: (status2) => {
               this.trace("Received status");
               if (this.readFilterPending) {
-                this.pendingChildStatus = status;
+                this.pendingChildStatus = status2;
               } else {
-                this.outputStatus(status);
+                this.outputStatus(status2);
               }
             }
           });
@@ -24185,24 +24185,24 @@ var require_resolving_call = __commonJS({
           } else if (this.pendingHalfClose) {
             this.child.halfClose();
           }
-        }, (status) => {
-          this.outputStatus(status);
+        }, (status2) => {
+          this.outputStatus(status2);
         });
       }
-      reportResolverError(status) {
+      reportResolverError(status2) {
         var _a;
         if ((_a = this.metadata) === null || _a === void 0 ? void 0 : _a.getOptions().waitForReady) {
           this.channel.queueCallForConfig(this);
         } else {
-          this.outputStatus(status);
+          this.outputStatus(status2);
         }
       }
-      cancelWithStatus(status, details) {
+      cancelWithStatus(status2, details) {
         var _a;
-        this.trace("cancelWithStatus code: " + status + ' details: "' + details + '"');
-        (_a = this.child) === null || _a === void 0 ? void 0 : _a.cancelWithStatus(status, details);
+        this.trace("cancelWithStatus code: " + status2 + ' details: "' + details + '"');
+        (_a = this.child) === null || _a === void 0 ? void 0 : _a.cancelWithStatus(status2, details);
         this.outputStatus({
-          code: status,
+          code: status2,
           details,
           metadata: new metadata_1.Metadata()
         });
@@ -24413,11 +24413,11 @@ var require_retrying_call = __commonJS({
           });
         });
       }
-      cancelWithStatus(status, details) {
-        this.trace("cancelWithStatus code: " + status + ' details: "' + details + '"');
-        this.reportStatus({ code: status, details, metadata: new metadata_1.Metadata() });
+      cancelWithStatus(status2, details) {
+        this.trace("cancelWithStatus code: " + status2 + ' details: "' + details + '"');
+        this.reportStatus({ code: status2, details, metadata: new metadata_1.Metadata() });
         for (const { call } of this.underlyingCalls) {
-          call.cancelWithStatus(status, details);
+          call.cancelWithStatus(status2, details);
         }
       }
       getPeer() {
@@ -24561,17 +24561,17 @@ var require_retrying_call = __commonJS({
         }
         return count;
       }
-      handleProcessedStatus(status, callIndex, pushback) {
+      handleProcessedStatus(status2, callIndex, pushback) {
         var _a, _b, _c;
         switch (this.state) {
           case "COMMITTED":
           case "NO_RETRY":
           case "TRANSPARENT_ONLY":
             this.commitCall(callIndex);
-            this.reportStatus(status);
+            this.reportStatus(status2);
             break;
           case "HEDGING":
-            if (this.isStatusCodeInList((_a = this.callConfig.methodConfig.hedgingPolicy.nonFatalStatusCodes) !== null && _a !== void 0 ? _a : [], status.code)) {
+            if (this.isStatusCodeInList((_a = this.callConfig.methodConfig.hedgingPolicy.nonFatalStatusCodes) !== null && _a !== void 0 ? _a : [], status2.code)) {
               (_b = this.retryThrottler) === null || _b === void 0 ? void 0 : _b.addCallFailed();
               let delayMs;
               if (pushback === null) {
@@ -24579,7 +24579,7 @@ var require_retrying_call = __commonJS({
               } else if (pushback < 0) {
                 this.state = "TRANSPARENT_ONLY";
                 this.commitCall(callIndex);
-                this.reportStatus(status);
+                this.reportStatus(status2);
                 return;
               } else {
                 delayMs = pushback;
@@ -24588,26 +24588,26 @@ var require_retrying_call = __commonJS({
                 this.maybeStartHedgingAttempt();
                 if (this.countActiveCalls() === 0) {
                   this.commitCall(callIndex);
-                  this.reportStatus(status);
+                  this.reportStatus(status2);
                 }
               }, delayMs);
             } else {
               this.commitCall(callIndex);
-              this.reportStatus(status);
+              this.reportStatus(status2);
             }
             break;
           case "RETRY":
-            if (this.isStatusCodeInList(this.callConfig.methodConfig.retryPolicy.retryableStatusCodes, status.code)) {
+            if (this.isStatusCodeInList(this.callConfig.methodConfig.retryPolicy.retryableStatusCodes, status2.code)) {
               (_c = this.retryThrottler) === null || _c === void 0 ? void 0 : _c.addCallFailed();
               this.maybeRetryCall(pushback, (retried) => {
                 if (!retried) {
                   this.commitCall(callIndex);
-                  this.reportStatus(status);
+                  this.reportStatus(status2);
                 }
               });
             } else {
               this.commitCall(callIndex);
-              this.reportStatus(status);
+              this.reportStatus(status2);
             }
             break;
         }
@@ -24623,36 +24623,36 @@ var require_retrying_call = __commonJS({
           return -1;
         }
       }
-      handleChildStatus(status, callIndex) {
+      handleChildStatus(status2, callIndex) {
         var _a;
         if (this.underlyingCalls[callIndex].state === "COMPLETED") {
           return;
         }
-        this.trace("state=" + this.state + " handling status with progress " + status.progress + " from child [" + this.underlyingCalls[callIndex].call.getCallNumber() + "] in state " + this.underlyingCalls[callIndex].state);
+        this.trace("state=" + this.state + " handling status with progress " + status2.progress + " from child [" + this.underlyingCalls[callIndex].call.getCallNumber() + "] in state " + this.underlyingCalls[callIndex].state);
         this.underlyingCalls[callIndex].state = "COMPLETED";
-        if (status.code === constants_1.Status.OK) {
+        if (status2.code === constants_1.Status.OK) {
           (_a = this.retryThrottler) === null || _a === void 0 ? void 0 : _a.addCallSucceeded();
           this.commitCall(callIndex);
-          this.reportStatus(status);
+          this.reportStatus(status2);
           return;
         }
         if (this.state === "NO_RETRY") {
           this.commitCall(callIndex);
-          this.reportStatus(status);
+          this.reportStatus(status2);
           return;
         }
         if (this.state === "COMMITTED") {
-          this.reportStatus(status);
+          this.reportStatus(status2);
           return;
         }
-        const pushback = this.getPushback(status.metadata);
-        switch (status.progress) {
+        const pushback = this.getPushback(status2.metadata);
+        switch (status2.progress) {
           case "NOT_STARTED":
             this.startNewAttempt();
             break;
           case "REFUSED":
             if (this.transparentRetryUsed) {
-              this.handleProcessedStatus(status, callIndex, pushback);
+              this.handleProcessedStatus(status2, callIndex, pushback);
             } else {
               this.transparentRetryUsed = true;
               this.startNewAttempt();
@@ -24660,10 +24660,10 @@ var require_retrying_call = __commonJS({
             break;
           case "DROP":
             this.commitCall(callIndex);
-            this.reportStatus(status);
+            this.reportStatus(status2);
             break;
           case "PROCESSED":
-            this.handleProcessedStatus(status, callIndex, pushback);
+            this.handleProcessedStatus(status2, callIndex, pushback);
             break;
         }
       }
@@ -24738,12 +24738,12 @@ var require_retrying_call = __commonJS({
               this.listener.onReceiveMessage(message);
             }
           },
-          onReceiveStatus: (status) => {
+          onReceiveStatus: (status2) => {
             this.trace("Received status from child [" + child.getCallNumber() + "]");
             if (!receivedMetadata && previousAttempts > 0) {
-              status.metadata.set(PREVIONS_RPC_ATTEMPTS_METADATA_KEY, `${previousAttempts}`);
+              status2.metadata.set(PREVIONS_RPC_ATTEMPTS_METADATA_KEY, `${previousAttempts}`);
             }
-            this.handleChildStatus(status, index);
+            this.handleChildStatus(status2, index);
           }
         });
         this.sendNextChildMessage(index);
@@ -25204,15 +25204,15 @@ var require_internal_channel = __commonJS({
               call.getConfig();
             }
           });
-        }, (status) => {
+        }, (status2) => {
           if (this.channelzEnabled) {
-            this.channelzInfoTracker.trace.addTrace("CT_WARNING", "Address resolution failed with code " + status.code + ' and details "' + status.details + '"');
+            this.channelzInfoTracker.trace.addTrace("CT_WARNING", "Address resolution failed with code " + status2.code + ' and details "' + status2.details + '"');
           }
           if (this.configSelectionQueue.length > 0) {
             this.trace("Name resolution failed with calls queued for config selection");
           }
           if (this.configSelector === null) {
-            this.currentResolutionError = Object.assign(Object.assign({}, (0, control_plane_status_1.restrictControlPlaneStatusCode)(status.code, status.details)), { metadata: status.metadata });
+            this.currentResolutionError = Object.assign(Object.assign({}, (0, control_plane_status_1.restrictControlPlaneStatusCode)(status2.code, status2.details)), { metadata: status2.metadata });
           }
           const localQueue = this.configSelectionQueue;
           this.configSelectionQueue = [];
@@ -25220,7 +25220,7 @@ var require_internal_channel = __commonJS({
             this.callRefTimerUnref();
           }
           for (const call of localQueue) {
-            call.reportResolverError(status);
+            call.reportResolverError(status2);
           }
         });
         this.filterStackFactory = new filter_stack_1.FilterStackFactory([
@@ -25373,9 +25373,9 @@ var require_internal_channel = __commonJS({
         }
         this.callCount += 1;
       }
-      onCallEnd(status) {
+      onCallEnd(status2) {
         if (this.channelzEnabled) {
-          if (status.code === constants_1.Status.OK) {
+          if (status2.code === constants_1.Status.OK) {
             this.channelzInfoTracker.callTracker.addCallSucceeded();
           } else {
             this.channelzInfoTracker.callTracker.addCallFailed();
@@ -25406,8 +25406,8 @@ var require_internal_channel = __commonJS({
         };
         const call = new resolving_call_1.ResolvingCall(this, method, finalOptions, this.filterStackFactory.clone(), callNumber);
         this.onCallStart();
-        call.addStatusWatcher((status) => {
-          this.onCallEnd(status);
+        call.addStatusWatcher((status2) => {
+          this.onCallEnd(status2);
         });
         return call;
       }
@@ -25571,18 +25571,18 @@ var require_server_call = __commonJS({
     var metadata_1 = require_metadata2();
     function serverErrorToStatus(error2, overrideTrailers) {
       var _a;
-      const status = {
+      const status2 = {
         code: constants_1.Status.UNKNOWN,
         details: "message" in error2 ? error2.message : "Unknown Error",
         metadata: (_a = overrideTrailers !== null && overrideTrailers !== void 0 ? overrideTrailers : error2.metadata) !== null && _a !== void 0 ? _a : null
       };
       if ("code" in error2 && typeof error2.code === "number" && Number.isInteger(error2.code)) {
-        status.code = error2.code;
+        status2.code = error2.code;
         if ("details" in error2 && typeof error2.details === "string") {
-          status.details = error2.details;
+          status2.details = error2.details;
         }
       }
-      return status;
+      return status2;
     }
     var ServerUnaryCallImpl = class extends events_1.EventEmitter {
       constructor(path2, call, metadata, request) {
@@ -26605,8 +26605,8 @@ var require_server_interceptors = __commonJS({
       sendMessage: (message, next) => {
         next(message);
       },
-      sendStatus: (status, next) => {
-        next(status);
+      sendStatus: (status2, next) => {
+        next(status2);
       }
     };
     var ServerInterceptingCall = class {
@@ -26677,8 +26677,8 @@ var require_server_interceptors = __commonJS({
           }
         });
       }
-      sendStatus(status) {
-        this.responder.sendStatus(status, (interceptedStatus) => {
+      sendStatus(status2) {
+        this.responder.sendStatus(status2, (interceptedStatus) => {
           if (this.processingMetadata || this.processingMessage) {
             this.pendingStatus = interceptedStatus;
           } else {
@@ -26819,13 +26819,13 @@ var require_server_interceptors = __commonJS({
       handleTimeoutHeader(timeoutHeader) {
         const match = timeoutHeader.toString().match(DEADLINE_REGEX);
         if (match === null) {
-          const status = {
+          const status2 = {
             code: constants_1.Status.INTERNAL,
             details: `Invalid ${GRPC_TIMEOUT_HEADER} value "${timeoutHeader}"`,
             metadata: null
           };
           process.nextTick(() => {
-            this.sendStatus(status);
+            this.sendStatus(status2);
           });
           return;
         }
@@ -26833,12 +26833,12 @@ var require_server_interceptors = __commonJS({
         const now = /* @__PURE__ */ new Date();
         this.deadline = now.setMilliseconds(now.getMilliseconds() + timeout);
         this.deadlineTimer = setTimeout(() => {
-          const status = {
+          const status2 = {
             code: constants_1.Status.DEADLINE_EXCEEDED,
             details: "Deadline exceeded",
             metadata: null
           };
-          this.sendStatus(status);
+          this.sendStatus(status2);
         }, timeout);
       }
       checkCancelled() {
@@ -27054,13 +27054,13 @@ var require_server_interceptors = __commonJS({
           callback();
         });
       }
-      sendStatus(status) {
+      sendStatus(status2) {
         var _a, _b, _c;
         if (this.checkCancelled()) {
           return;
         }
-        trace("Request to method " + ((_a = this.handler) === null || _a === void 0 ? void 0 : _a.path) + " ended with status code: " + constants_1.Status[status.code] + " details: " + status.details);
-        const statusMetadata = (_c = (_b = status.metadata) === null || _b === void 0 ? void 0 : _b.clone()) !== null && _c !== void 0 ? _c : new metadata_1.Metadata();
+        trace("Request to method " + ((_a = this.handler) === null || _a === void 0 ? void 0 : _a.path) + " ended with status code: " + constants_1.Status[status2.code] + " details: " + status2.details);
+        const statusMetadata = (_c = (_b = status2.metadata) === null || _b === void 0 ? void 0 : _b.clone()) !== null && _c !== void 0 ? _c : new metadata_1.Metadata();
         if (this.shouldSendMetrics) {
           statusMetadata.set(orca_1.GRPC_METRICS_HEADER, this.metricsRecorder.serialize());
         }
@@ -27071,9 +27071,9 @@ var require_server_interceptors = __commonJS({
               if (this.callEventTracker && !this.streamEnded) {
                 this.streamEnded = true;
                 this.callEventTracker.onStreamEnd(true);
-                this.callEventTracker.onCallEnd(status);
+                this.callEventTracker.onCallEnd(status2);
               }
-              const trailersToSend = Object.assign({ [GRPC_STATUS_HEADER]: status.code, [GRPC_MESSAGE_HEADER]: encodeURI(status.details) }, statusMetadata.toHttp2Headers());
+              const trailersToSend = Object.assign({ [GRPC_STATUS_HEADER]: status2.code, [GRPC_MESSAGE_HEADER]: encodeURI(status2.details) }, statusMetadata.toHttp2Headers());
               this.stream.sendTrailers(trailersToSend);
               this.notifyOnCancel();
             });
@@ -27085,9 +27085,9 @@ var require_server_interceptors = __commonJS({
           if (this.callEventTracker && !this.streamEnded) {
             this.streamEnded = true;
             this.callEventTracker.onStreamEnd(true);
-            this.callEventTracker.onCallEnd(status);
+            this.callEventTracker.onCallEnd(status2);
           }
-          const trailersToSend = Object.assign(Object.assign({ [GRPC_STATUS_HEADER]: status.code, [GRPC_MESSAGE_HEADER]: encodeURI(status.details) }, defaultResponseHeaders), statusMetadata.toHttp2Headers());
+          const trailersToSend = Object.assign(Object.assign({ [GRPC_STATUS_HEADER]: status2.code, [GRPC_MESSAGE_HEADER]: encodeURI(status2.details) }, defaultResponseHeaders), statusMetadata.toHttp2Headers());
           this.stream.respond(trailersToSend, { endStream: true });
           this.notifyOnCancel();
         }
@@ -28030,8 +28030,8 @@ var require_server = __commonJS({
                 channelzSessionInfo.lastMessageReceivedTimestamp = /* @__PURE__ */ new Date();
               }
             },
-            onCallEnd: (status) => {
-              if (status.code === constants_1.Status.OK) {
+            onCallEnd: (status2) => {
+              if (status2.code === constants_1.Status.OK) {
                 this.callTracker.addCallSucceeded();
               } else {
                 this.callTracker.addCallFailed();
@@ -28644,17 +28644,17 @@ var require_status_builder = __commonJS({
        * Builds the status object.
        */
       build() {
-        const status = {};
+        const status2 = {};
         if (this.code !== null) {
-          status.code = this.code;
+          status2.code = this.code;
         }
         if (this.details !== null) {
-          status.details = this.details;
+          status2.details = this.details;
         }
         if (this.metadata !== null) {
-          status.metadata = this.metadata;
+          status2.metadata = this.metadata;
         }
-        return status;
+        return status2;
       }
     };
     exports2.StatusBuilder = StatusBuilder;
@@ -31569,18 +31569,18 @@ var ParseStatus = class _ParseStatus {
     if (this.value !== "aborted")
       this.value = "aborted";
   }
-  static mergeArray(status, results) {
+  static mergeArray(status2, results) {
     const arrayValue = [];
     for (const s of results) {
       if (s.status === "aborted")
         return INVALID;
       if (s.status === "dirty")
-        status.dirty();
+        status2.dirty();
       arrayValue.push(s.value);
     }
-    return { status: status.value, value: arrayValue };
+    return { status: status2.value, value: arrayValue };
   }
-  static async mergeObjectAsync(status, pairs2) {
+  static async mergeObjectAsync(status2, pairs2) {
     const syncPairs = [];
     for (const pair of pairs2) {
       const key = await pair.key;
@@ -31590,9 +31590,9 @@ var ParseStatus = class _ParseStatus {
         value
       });
     }
-    return _ParseStatus.mergeObjectSync(status, syncPairs);
+    return _ParseStatus.mergeObjectSync(status2, syncPairs);
   }
-  static mergeObjectSync(status, pairs2) {
+  static mergeObjectSync(status2, pairs2) {
     const finalObject = {};
     for (const pair of pairs2) {
       const { key, value } = pair;
@@ -31601,14 +31601,14 @@ var ParseStatus = class _ParseStatus {
       if (value.status === "aborted")
         return INVALID;
       if (key.status === "dirty")
-        status.dirty();
+        status2.dirty();
       if (value.status === "dirty")
-        status.dirty();
+        status2.dirty();
       if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
         finalObject[key.value] = value.value;
       }
     }
-    return { status: status.value, value: finalObject };
+    return { status: status2.value, value: finalObject };
   }
 };
 var INVALID = Object.freeze({
@@ -32068,7 +32068,7 @@ var ZodString = class _ZodString2 extends ZodType {
       });
       return INVALID;
     }
-    const status = new ParseStatus();
+    const status2 = new ParseStatus();
     let ctx = void 0;
     for (const check2 of this._def.checks) {
       if (check2.kind === "min") {
@@ -32082,7 +32082,7 @@ var ZodString = class _ZodString2 extends ZodType {
             exact: false,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "max") {
         if (input.data.length > check2.value) {
@@ -32095,7 +32095,7 @@ var ZodString = class _ZodString2 extends ZodType {
             exact: false,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "length") {
         const tooBig = input.data.length > check2.value;
@@ -32121,7 +32121,7 @@ var ZodString = class _ZodString2 extends ZodType {
               message: check2.message
             });
           }
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "email") {
         if (!emailRegex.test(input.data)) {
@@ -32131,7 +32131,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "emoji") {
         if (!emojiRegex) {
@@ -32144,7 +32144,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "uuid") {
         if (!uuidRegex.test(input.data)) {
@@ -32154,7 +32154,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "nanoid") {
         if (!nanoidRegex.test(input.data)) {
@@ -32164,7 +32164,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "cuid") {
         if (!cuidRegex.test(input.data)) {
@@ -32174,7 +32174,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "cuid2") {
         if (!cuid2Regex.test(input.data)) {
@@ -32184,7 +32184,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "ulid") {
         if (!ulidRegex.test(input.data)) {
@@ -32194,7 +32194,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "url") {
         try {
@@ -32206,7 +32206,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "regex") {
         check2.regex.lastIndex = 0;
@@ -32218,7 +32218,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "trim") {
         input.data = input.data.trim();
@@ -32230,7 +32230,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: { includes: check2.value, position: check2.position },
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "toLowerCase") {
         input.data = input.data.toLowerCase();
@@ -32244,7 +32244,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: { startsWith: check2.value },
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "endsWith") {
         if (!input.data.endsWith(check2.value)) {
@@ -32254,7 +32254,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: { endsWith: check2.value },
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "datetime") {
         const regex = datetimeRegex(check2);
@@ -32265,7 +32265,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: "datetime",
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "date") {
         const regex = dateRegex;
@@ -32276,7 +32276,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: "date",
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "time") {
         const regex = timeRegex(check2);
@@ -32287,7 +32287,7 @@ var ZodString = class _ZodString2 extends ZodType {
             validation: "time",
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "duration") {
         if (!durationRegex.test(input.data)) {
@@ -32297,7 +32297,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "ip") {
         if (!isValidIP(input.data, check2.version)) {
@@ -32307,7 +32307,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "jwt") {
         if (!isValidJWT(input.data, check2.alg)) {
@@ -32317,7 +32317,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "cidr") {
         if (!isValidCidr(input.data, check2.version)) {
@@ -32327,7 +32327,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "base64") {
         if (!base64Regex.test(input.data)) {
@@ -32337,7 +32337,7 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "base64url") {
         if (!base64urlRegex.test(input.data)) {
@@ -32347,13 +32347,13 @@ var ZodString = class _ZodString2 extends ZodType {
             code: ZodIssueCode.invalid_string,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else {
         util.assertNever(check2);
       }
     }
-    return { status: status.value, value: input.data };
+    return { status: status2.value, value: input.data };
   }
   _regex(regex, validation, message) {
     return this.refinement((data) => regex.test(data), {
@@ -32629,7 +32629,7 @@ var ZodNumber = class _ZodNumber extends ZodType {
       return INVALID;
     }
     let ctx = void 0;
-    const status = new ParseStatus();
+    const status2 = new ParseStatus();
     for (const check2 of this._def.checks) {
       if (check2.kind === "int") {
         if (!util.isInteger(input.data)) {
@@ -32640,7 +32640,7 @@ var ZodNumber = class _ZodNumber extends ZodType {
             received: "float",
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "min") {
         const tooSmall = check2.inclusive ? input.data < check2.value : input.data <= check2.value;
@@ -32654,7 +32654,7 @@ var ZodNumber = class _ZodNumber extends ZodType {
             exact: false,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "max") {
         const tooBig = check2.inclusive ? input.data > check2.value : input.data >= check2.value;
@@ -32668,7 +32668,7 @@ var ZodNumber = class _ZodNumber extends ZodType {
             exact: false,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "multipleOf") {
         if (floatSafeRemainder(input.data, check2.value) !== 0) {
@@ -32678,7 +32678,7 @@ var ZodNumber = class _ZodNumber extends ZodType {
             multipleOf: check2.value,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "finite") {
         if (!Number.isFinite(input.data)) {
@@ -32687,13 +32687,13 @@ var ZodNumber = class _ZodNumber extends ZodType {
             code: ZodIssueCode.not_finite,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else {
         util.assertNever(check2);
       }
     }
-    return { status: status.value, value: input.data };
+    return { status: status2.value, value: input.data };
   }
   gte(value, message) {
     return this.setLimit("min", value, true, errorUtil.toString(message));
@@ -32858,7 +32858,7 @@ var ZodBigInt = class _ZodBigInt extends ZodType {
       return this._getInvalidInput(input);
     }
     let ctx = void 0;
-    const status = new ParseStatus();
+    const status2 = new ParseStatus();
     for (const check2 of this._def.checks) {
       if (check2.kind === "min") {
         const tooSmall = check2.inclusive ? input.data < check2.value : input.data <= check2.value;
@@ -32871,7 +32871,7 @@ var ZodBigInt = class _ZodBigInt extends ZodType {
             inclusive: check2.inclusive,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "max") {
         const tooBig = check2.inclusive ? input.data > check2.value : input.data >= check2.value;
@@ -32884,7 +32884,7 @@ var ZodBigInt = class _ZodBigInt extends ZodType {
             inclusive: check2.inclusive,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "multipleOf") {
         if (input.data % check2.value !== BigInt(0)) {
@@ -32894,13 +32894,13 @@ var ZodBigInt = class _ZodBigInt extends ZodType {
             multipleOf: check2.value,
             message: check2.message
           });
-          status.dirty();
+          status2.dirty();
         }
       } else {
         util.assertNever(check2);
       }
     }
-    return { status: status.value, value: input.data };
+    return { status: status2.value, value: input.data };
   }
   _getInvalidInput(input) {
     const ctx = this._getOrReturnCtx(input);
@@ -33058,7 +33058,7 @@ var ZodDate = class _ZodDate extends ZodType {
       });
       return INVALID;
     }
-    const status = new ParseStatus();
+    const status2 = new ParseStatus();
     let ctx = void 0;
     for (const check2 of this._def.checks) {
       if (check2.kind === "min") {
@@ -33072,7 +33072,7 @@ var ZodDate = class _ZodDate extends ZodType {
             minimum: check2.value,
             type: "date"
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (check2.kind === "max") {
         if (input.data.getTime() > check2.value) {
@@ -33085,14 +33085,14 @@ var ZodDate = class _ZodDate extends ZodType {
             maximum: check2.value,
             type: "date"
           });
-          status.dirty();
+          status2.dirty();
         }
       } else {
         util.assertNever(check2);
       }
     }
     return {
-      status: status.value,
+      status: status2.value,
       value: new Date(input.data.getTime())
     };
   }
@@ -33278,7 +33278,7 @@ ZodVoid.create = (params) => {
 };
 var ZodArray = class _ZodArray extends ZodType {
   _parse(input) {
-    const { ctx, status } = this._processInputParams(input);
+    const { ctx, status: status2 } = this._processInputParams(input);
     const def = this._def;
     if (ctx.parsedType !== ZodParsedType.array) {
       addIssueToContext(ctx, {
@@ -33301,7 +33301,7 @@ var ZodArray = class _ZodArray extends ZodType {
           exact: true,
           message: def.exactLength.message
         });
-        status.dirty();
+        status2.dirty();
       }
     }
     if (def.minLength !== null) {
@@ -33314,7 +33314,7 @@ var ZodArray = class _ZodArray extends ZodType {
           exact: false,
           message: def.minLength.message
         });
-        status.dirty();
+        status2.dirty();
       }
     }
     if (def.maxLength !== null) {
@@ -33327,20 +33327,20 @@ var ZodArray = class _ZodArray extends ZodType {
           exact: false,
           message: def.maxLength.message
         });
-        status.dirty();
+        status2.dirty();
       }
     }
     if (ctx.common.async) {
       return Promise.all([...ctx.data].map((item, i) => {
         return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
       })).then((result2) => {
-        return ParseStatus.mergeArray(status, result2);
+        return ParseStatus.mergeArray(status2, result2);
       });
     }
     const result = [...ctx.data].map((item, i) => {
       return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
     });
-    return ParseStatus.mergeArray(status, result);
+    return ParseStatus.mergeArray(status2, result);
   }
   get element() {
     return this._def.type;
@@ -33429,7 +33429,7 @@ var ZodObject = class _ZodObject extends ZodType {
       });
       return INVALID;
     }
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     const { shape, keys: shapeKeys } = this._getCached();
     const extraKeys = [];
     if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
@@ -33464,7 +33464,7 @@ var ZodObject = class _ZodObject extends ZodType {
             code: ZodIssueCode.unrecognized_keys,
             keys: extraKeys
           });
-          status.dirty();
+          status2.dirty();
         }
       } else if (unknownKeys === "strip") {
       } else {
@@ -33498,10 +33498,10 @@ var ZodObject = class _ZodObject extends ZodType {
         }
         return syncPairs;
       }).then((syncPairs) => {
-        return ParseStatus.mergeObjectSync(status, syncPairs);
+        return ParseStatus.mergeObjectSync(status2, syncPairs);
       });
     } else {
-      return ParseStatus.mergeObjectSync(status, pairs2);
+      return ParseStatus.mergeObjectSync(status2, pairs2);
     }
   }
   get shape() {
@@ -33979,7 +33979,7 @@ function mergeValues(a, b) {
 }
 var ZodIntersection = class extends ZodType {
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     const handleParsed = (parsedLeft, parsedRight) => {
       if (isAborted(parsedLeft) || isAborted(parsedRight)) {
         return INVALID;
@@ -33992,9 +33992,9 @@ var ZodIntersection = class extends ZodType {
         return INVALID;
       }
       if (isDirty(parsedLeft) || isDirty(parsedRight)) {
-        status.dirty();
+        status2.dirty();
       }
-      return { status: status.value, value: merged.data };
+      return { status: status2.value, value: merged.data };
     };
     if (ctx.common.async) {
       return Promise.all([
@@ -34032,7 +34032,7 @@ ZodIntersection.create = (left, right, params) => {
 };
 var ZodTuple = class _ZodTuple extends ZodType {
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     if (ctx.parsedType !== ZodParsedType.array) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
@@ -34060,7 +34060,7 @@ var ZodTuple = class _ZodTuple extends ZodType {
         exact: false,
         type: "array"
       });
-      status.dirty();
+      status2.dirty();
     }
     const items = [...ctx.data].map((item, itemIndex) => {
       const schema2 = this._def.items[itemIndex] || this._def.rest;
@@ -34070,10 +34070,10 @@ var ZodTuple = class _ZodTuple extends ZodType {
     }).filter((x) => !!x);
     if (ctx.common.async) {
       return Promise.all(items).then((results) => {
-        return ParseStatus.mergeArray(status, results);
+        return ParseStatus.mergeArray(status2, results);
       });
     } else {
-      return ParseStatus.mergeArray(status, items);
+      return ParseStatus.mergeArray(status2, items);
     }
   }
   get items() {
@@ -34105,7 +34105,7 @@ var ZodRecord = class _ZodRecord extends ZodType {
     return this._def.valueType;
   }
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     if (ctx.parsedType !== ZodParsedType.object) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
@@ -34125,9 +34125,9 @@ var ZodRecord = class _ZodRecord extends ZodType {
       });
     }
     if (ctx.common.async) {
-      return ParseStatus.mergeObjectAsync(status, pairs2);
+      return ParseStatus.mergeObjectAsync(status2, pairs2);
     } else {
-      return ParseStatus.mergeObjectSync(status, pairs2);
+      return ParseStatus.mergeObjectSync(status2, pairs2);
     }
   }
   get element() {
@@ -34158,7 +34158,7 @@ var ZodMap = class extends ZodType {
     return this._def.valueType;
   }
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     if (ctx.parsedType !== ZodParsedType.map) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
@@ -34185,11 +34185,11 @@ var ZodMap = class extends ZodType {
             return INVALID;
           }
           if (key.status === "dirty" || value.status === "dirty") {
-            status.dirty();
+            status2.dirty();
           }
           finalMap.set(key.value, value.value);
         }
-        return { status: status.value, value: finalMap };
+        return { status: status2.value, value: finalMap };
       });
     } else {
       const finalMap = /* @__PURE__ */ new Map();
@@ -34200,11 +34200,11 @@ var ZodMap = class extends ZodType {
           return INVALID;
         }
         if (key.status === "dirty" || value.status === "dirty") {
-          status.dirty();
+          status2.dirty();
         }
         finalMap.set(key.value, value.value);
       }
-      return { status: status.value, value: finalMap };
+      return { status: status2.value, value: finalMap };
     }
   }
 };
@@ -34218,7 +34218,7 @@ ZodMap.create = (keyType, valueType, params) => {
 };
 var ZodSet = class _ZodSet extends ZodType {
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     if (ctx.parsedType !== ZodParsedType.set) {
       addIssueToContext(ctx, {
         code: ZodIssueCode.invalid_type,
@@ -34238,7 +34238,7 @@ var ZodSet = class _ZodSet extends ZodType {
           exact: false,
           message: def.minSize.message
         });
-        status.dirty();
+        status2.dirty();
       }
     }
     if (def.maxSize !== null) {
@@ -34251,7 +34251,7 @@ var ZodSet = class _ZodSet extends ZodType {
           exact: false,
           message: def.maxSize.message
         });
-        status.dirty();
+        status2.dirty();
       }
     }
     const valueType = this._def.valueType;
@@ -34261,10 +34261,10 @@ var ZodSet = class _ZodSet extends ZodType {
         if (element.status === "aborted")
           return INVALID;
         if (element.status === "dirty")
-          status.dirty();
+          status2.dirty();
         parsedSet.add(element.value);
       }
-      return { status: status.value, value: parsedSet };
+      return { status: status2.value, value: parsedSet };
     }
     const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
     if (ctx.common.async) {
@@ -34595,15 +34595,15 @@ var ZodEffects = class extends ZodType {
     return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
   }
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     const effect = this._def.effect || null;
     const checkCtx = {
       addIssue: (arg) => {
         addIssueToContext(ctx, arg);
         if (arg.fatal) {
-          status.abort();
+          status2.abort();
         } else {
-          status.dirty();
+          status2.dirty();
         }
       },
       get path() {
@@ -34615,7 +34615,7 @@ var ZodEffects = class extends ZodType {
       const processed = effect.transform(ctx.data, checkCtx);
       if (ctx.common.async) {
         return Promise.resolve(processed).then(async (processed2) => {
-          if (status.value === "aborted")
+          if (status2.value === "aborted")
             return INVALID;
           const result = await this._def.schema._parseAsync({
             data: processed2,
@@ -34626,12 +34626,12 @@ var ZodEffects = class extends ZodType {
             return INVALID;
           if (result.status === "dirty")
             return DIRTY(result.value);
-          if (status.value === "dirty")
+          if (status2.value === "dirty")
             return DIRTY(result.value);
           return result;
         });
       } else {
-        if (status.value === "aborted")
+        if (status2.value === "aborted")
           return INVALID;
         const result = this._def.schema._parseSync({
           data: processed,
@@ -34642,7 +34642,7 @@ var ZodEffects = class extends ZodType {
           return INVALID;
         if (result.status === "dirty")
           return DIRTY(result.value);
-        if (status.value === "dirty")
+        if (status2.value === "dirty")
           return DIRTY(result.value);
         return result;
       }
@@ -34667,17 +34667,17 @@ var ZodEffects = class extends ZodType {
         if (inner.status === "aborted")
           return INVALID;
         if (inner.status === "dirty")
-          status.dirty();
+          status2.dirty();
         executeRefinement(inner.value);
-        return { status: status.value, value: inner.value };
+        return { status: status2.value, value: inner.value };
       } else {
         return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
           if (inner.status === "aborted")
             return INVALID;
           if (inner.status === "dirty")
-            status.dirty();
+            status2.dirty();
           return executeRefinement(inner.value).then(() => {
-            return { status: status.value, value: inner.value };
+            return { status: status2.value, value: inner.value };
           });
         });
       }
@@ -34695,13 +34695,13 @@ var ZodEffects = class extends ZodType {
         if (result instanceof Promise) {
           throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
         }
-        return { status: status.value, value: result };
+        return { status: status2.value, value: result };
       } else {
         return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
           if (!isValid(base))
             return INVALID;
           return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
-            status: status.value,
+            status: status2.value,
             value: result
           }));
         });
@@ -34880,7 +34880,7 @@ var ZodBranded = class extends ZodType {
 };
 var ZodPipeline = class _ZodPipeline extends ZodType {
   _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
+    const { status: status2, ctx } = this._processInputParams(input);
     if (ctx.common.async) {
       const handleAsync = async () => {
         const inResult = await this._def.in._parseAsync({
@@ -34891,7 +34891,7 @@ var ZodPipeline = class _ZodPipeline extends ZodType {
         if (inResult.status === "aborted")
           return INVALID;
         if (inResult.status === "dirty") {
-          status.dirty();
+          status2.dirty();
           return DIRTY(inResult.value);
         } else {
           return this._def.out._parseAsync({
@@ -34911,7 +34911,7 @@ var ZodPipeline = class _ZodPipeline extends ZodType {
       if (inResult.status === "aborted")
         return INVALID;
       if (inResult.status === "dirty") {
-        status.dirty();
+        status2.dirty();
         return {
           status: "dirty",
           value: inResult.value
@@ -40388,8 +40388,8 @@ var UrlElicitationRequiredError = class extends McpError {
 };
 
 // node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/interfaces.js
-function isTerminal(status) {
-  return status === "completed" || status === "failed" || status === "cancelled";
+function isTerminal(status2) {
+  return status2 === "completed" || status2 === "failed" || status2 === "cancelled";
 }
 
 // node_modules/zod-to-json-schema/dist/esm/parsers/string.js
@@ -41306,8 +41306,8 @@ var Protocol = class {
         }
         return task;
       },
-      storeTaskResult: async (taskId, status, result) => {
-        await taskStore.storeTaskResult(taskId, status, result, sessionId);
+      storeTaskResult: async (taskId, status2, result) => {
+        await taskStore.storeTaskResult(taskId, status2, result, sessionId);
         const task = await taskStore.getTask(taskId, sessionId);
         if (task) {
           const notification = TaskStatusNotificationSchema.parse({
@@ -41323,15 +41323,15 @@ var Protocol = class {
       getTaskResult: (taskId) => {
         return taskStore.getTaskResult(taskId, sessionId);
       },
-      updateTaskStatus: async (taskId, status, statusMessage) => {
+      updateTaskStatus: async (taskId, status2, statusMessage) => {
         const task = await taskStore.getTask(taskId, sessionId);
         if (!task) {
           throw new McpError(ErrorCode.InvalidParams, `Task "${taskId}" not found - it may have been cleaned up`);
         }
         if (isTerminal(task.status)) {
-          throw new McpError(ErrorCode.InvalidParams, `Cannot update task "${taskId}" from terminal status "${task.status}" to "${status}". Terminal states (completed, failed, cancelled) cannot transition to other states.`);
+          throw new McpError(ErrorCode.InvalidParams, `Cannot update task "${taskId}" from terminal status "${task.status}" to "${status2}". Terminal states (completed, failed, cancelled) cannot transition to other states.`);
         }
-        await taskStore.updateTaskStatus(taskId, status, statusMessage, sessionId);
+        await taskStore.updateTaskStatus(taskId, status2, statusMessage, sessionId);
         const updatedTask = await taskStore.getTask(taskId, sessionId);
         if (updatedTask) {
           const notification = TaskStatusNotificationSchema.parse({
@@ -42236,41 +42236,37 @@ var DispatchClient = class {
       yield event;
     }
   }
+  async _unaryWithRetry(method, request) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const metadata = await this._buildMetadata();
+      try {
+        return await new Promise((resolve7, reject) => {
+          this.stub[method](
+            request,
+            metadata,
+            (err, res) => err ? reject(err) : resolve7(res)
+          );
+        });
+      } catch (err) {
+        if (attempt === 0 && err?.code === grpc.status.UNAUTHENTICATED && this.tokenProvider) {
+          console.error(`[swarp] Auth rejected on ${method} \u2014 refreshing token and retrying`);
+          continue;
+        }
+        throw err;
+      }
+    }
+  }
   async listAgents() {
-    const metadata = await this._buildMetadata();
-    return new Promise((resolve7, reject) => {
-      this.stub.ListAgents({}, metadata, (err, res) => err ? reject(err) : resolve7(res));
-    });
+    return this._unaryWithRetry("ListAgents", {});
   }
   async cancelTask(taskId) {
-    const metadata = await this._buildMetadata();
-    return new Promise((resolve7, reject) => {
-      this.stub.CancelTask(
-        { task_id: taskId },
-        metadata,
-        (err, res) => err ? reject(err) : resolve7(res)
-      );
-    });
+    return this._unaryWithRetry("CancelTask", { task_id: taskId });
   }
   async getAgentStatus(agent) {
-    const metadata = await this._buildMetadata();
-    return new Promise((resolve7, reject) => {
-      this.stub.GetAgentStatus(
-        { agent },
-        metadata,
-        (err, res) => err ? reject(err) : resolve7(res)
-      );
-    });
+    return this._unaryWithRetry("GetAgentStatus", { agent });
   }
   async pushRestart({ agent = "", reason = "" } = {}) {
-    const metadata = await this._buildMetadata();
-    return new Promise((resolve7, reject) => {
-      this.stub.PushRestart(
-        { agent, reason },
-        metadata,
-        (err, res) => err ? reject(err) : resolve7(res)
-      );
-    });
+    return this._unaryWithRetry("PushRestart", { agent, reason });
   }
   close() {
     this.stub.close();
@@ -45746,8 +45742,8 @@ function deploy(configPath, appName) {
 function getAppUrl(appName) {
   try {
     const output = flyctl(["status", "--app", appName, "--json"]);
-    const status = JSON.parse(output);
-    return status.Hostname ?? status.hostname ?? `${appName}.fly.dev`;
+    const status2 = JSON.parse(output);
+    return status2.Hostname ?? status2.hostname ?? `${appName}.fly.dev`;
   } catch {
     return `${appName}.fly.dev`;
   }
@@ -46599,7 +46595,6 @@ async function handlePushUpdate(client, toolArgs) {
 
 // src/mcp-server/index.mjs
 var tokenCache = new TokenCache();
-var POLL_INTERVAL_MS = 3e4;
 function notAuthenticatedResponse(err) {
   return {
     content: [{
@@ -46680,17 +46675,18 @@ async function startMcpServer() {
         );
       }
     }
-    setInterval(async () => {
-      try {
-        const changed = await cache.refresh();
-        if (changed) {
-          console.error("[swarp] Agent set changed \u2014 notifying client");
-          await server.notification({ method: "notifications/tools/list_changed" });
-        }
-      } catch (err) {
-        console.error(`[swarp] Agent poll failed: ${err.message}`);
+  }
+  async function refreshAndNotify() {
+    if (!cache) return;
+    try {
+      const changed = await cache.refresh();
+      if (changed) {
+        console.error("[swarp] Agent set changed \u2014 notifying client");
+        await server.notification({ method: "notifications/tools/list_changed" });
       }
-    }, POLL_INTERVAL_MS);
+    } catch (err) {
+      console.error(`[swarp] Agent refresh failed: ${err.message}`);
+    }
   }
   const localTools = client ? buildLocalTools(config2) : [];
   const onboardingTools = [authToolDef, onboardToolDef, deployRouterToolDef];
@@ -46703,6 +46699,7 @@ async function startMcpServer() {
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const { name, arguments: toolArgs } = req.params;
     if (name === "agent_dispatch") {
+      if (cache && cache.agents.length === 0) await refreshAndNotify();
       const agents = cache?.agents ?? [];
       const agentName = toolArgs?.agent;
       const known = agents.find((a) => a.name === agentName);
@@ -46721,8 +46718,16 @@ async function startMcpServer() {
     if (name === "swarp_audit") return handleAudit(config2, toolArgs);
     if (name === "swarp_generate") return handleGenerate(config2, toolArgs);
     if (name === "swarp_status") return handleStatus2(client, toolArgs);
-    if (name === "swarp_deploy") return handleDeployAgent(config2, toolArgs);
-    if (name === "swarp_push_update") return handlePushUpdate(client, toolArgs);
+    if (name === "swarp_deploy") {
+      const result = await handleDeployAgent(config2, toolArgs);
+      await refreshAndNotify();
+      return result;
+    }
+    if (name === "swarp_push_update") {
+      const result = await handlePushUpdate(client, toolArgs);
+      await refreshAndNotify();
+      return result;
+    }
     return {
       content: [{ type: "text", text: `Unknown tool: ${name}` }],
       isError: true
@@ -46733,8 +46738,11 @@ async function startMcpServer() {
 }
 function buildDispatchTool(agents) {
   const agentLines = agents.map((a) => {
-    const modes = (a.modes ?? []).map((m) => m.name).join(", ");
-    return `- ${a.name} (${a.role ?? "agent"}): modes ${modes || "chat"}`;
+    const modes = (a.modes ?? []).map((m) => {
+      if (m.description) return `${m.name} (${m.description})`;
+      return m.name;
+    }).join(", ");
+    return `- ${a.name} (${a.role ?? "agent"}): ${modes || "chat"}`;
   });
   return {
     name: "agent_dispatch",
@@ -46875,14 +46883,23 @@ async function handleStatus2(client, toolArgs) {
   const { agent } = toolArgs ?? {};
   try {
     if (agent) {
-      const status = await client.getAgentStatus(agent);
-      return { content: [{ type: "text", text: JSON.stringify(status, null, 2) }] };
+      const status2 = await client.getAgentStatus(agent);
+      return { content: [{ type: "text", text: JSON.stringify(status2, null, 2) }] };
     }
     const { agents } = await client.listAgents();
-    const lines = (agents ?? []).map(
-      (a) => `${a.name} (${a.online ? "online" : "offline"}) \u2014 ${a.modes?.length ?? 0} mode(s)`
-    );
-    return { content: [{ type: "text", text: lines.join("\n") || "No agents registered" }] };
+    const list = agents ?? [];
+    if (list.length === 0) {
+      return { content: [{ type: "text", text: "No agents connected" }] };
+    }
+    const lines = list.map((a) => {
+      const status2 = a.online ? "\u{1F7E2} online" : "\u{1F534} offline";
+      const modes = (a.modes ?? []).map((m) => {
+        if (m.description) return `  - ${m.name}: ${m.description}`;
+        return `  - ${m.name}`;
+      });
+      return [`${a.name} (${status2})`, ...modes].join("\n");
+    });
+    return { content: [{ type: "text", text: lines.join("\n\n") }] };
   } catch (err) {
     if (err instanceof NotAuthenticatedError) return notAuthenticatedResponse(err);
     return { content: [{ type: "text", text: `Status error: ${err.message}` }], isError: true };
