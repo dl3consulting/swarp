@@ -46815,7 +46815,7 @@ async function handleAgentDispatch(client, agentName, toolArgs) {
   try {
     for await (const event of client.dispatchTask(
       agentName,
-      { structured: { mode, params: { raw: context } } },
+      { structured: { mode, params: { content: context } } },
       sessionId
     )) {
       events.push(event);
@@ -46829,8 +46829,20 @@ async function handleAgentDispatch(client, agentName, toolArgs) {
     console.error(`[swarp] dispatch failed: ${where}: ${err?.stack ?? err}`);
     return { content: [{ type: "text", text: text2 }], isError: true };
   }
+  const toolNames = [];
+  for (const e of events) {
+    const ev = e.event;
+    if (ev?.type === "EVENT_TYPE_TOOL_USE" && ev.text) {
+      if (!toolNames.includes(ev.text)) toolNames.push(ev.text);
+    }
+  }
   const lastEvent = events.at(-1)?.event;
-  const text = lastEvent?.result?.summary ?? lastEvent?.text ?? (events.length === 0 ? "(stream returned no events)" : "(agent returned no output)");
+  let text = lastEvent?.result?.summary ?? lastEvent?.text ?? (events.length === 0 ? "(stream returned no events)" : "(agent returned no output)");
+  if (toolNames.length > 0) {
+    text = `Tools used: ${toolNames.join(" \u2192 ")}
+
+${text}`;
+  }
   return { content: [{ type: "text", text }] };
 }
 async function handleAudit(config2, toolArgs) {

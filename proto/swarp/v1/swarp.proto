@@ -36,6 +36,7 @@ message Hello {
   string name = 1;
   string version = 2;
   repeated ModeInfo modes = 3;
+  string avatar_url = 4;
 }
 
 message ConnectResponse {
@@ -90,6 +91,11 @@ message StructuredDispatch {
   map<string, string> params = 2;
 }
 
+message AgentIdentity {
+  string name = 1;
+  string avatar_url = 2;
+}
+
 message AgentEvent {
   enum EventType {
     EVENT_TYPE_UNSPECIFIED = 0;
@@ -97,6 +103,7 @@ message AgentEvent {
     EVENT_TYPE_TOOL_USE = 2;
     EVENT_TYPE_DONE = 3;
     EVENT_TYPE_ERROR = 4;
+    EVENT_TYPE_ACK = 5;
   }
   string task_id = 1;
   EventType type = 2;
@@ -104,6 +111,7 @@ message AgentEvent {
   string session_id = 4;
   TaskResult result = 5;
   int64 timestamp = 6;
+  AgentIdentity agent = 7;
 }
 
 message TaskResult {
@@ -140,6 +148,7 @@ message AgentInfo {
   string role = 3;
   repeated ModeInfo modes = 4;
   bool online = 5;
+  string avatar_url = 6;
 }
 
 message ModeInfo {
