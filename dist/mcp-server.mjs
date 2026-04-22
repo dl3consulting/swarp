@@ -2986,7 +2986,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve7.call(this, root, ref);
+      let _sch = resolve8.call(this, root, ref);
       if (_sch === void 0) {
         const schema2 = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref];
         const { schemaId } = this.opts;
@@ -3013,7 +3013,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve7(root, ref) {
+    function resolve8(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -3588,7 +3588,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve7(baseURI, relativeURI, options) {
+    function resolve8(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
       schemelessOptions.skipEscape = true;
@@ -3815,7 +3815,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize,
-      resolve: resolve7,
+      resolve: resolve8,
       resolveComponent,
       equal,
       serialize,
@@ -7346,7 +7346,7 @@ var require_call_credentials = __commonJS({
           if (isCurrentOauth2Client(googleCredentials)) {
             getHeaders = googleCredentials.getRequestHeaders(options.service_url);
           } else {
-            getHeaders = new Promise((resolve7, reject) => {
+            getHeaders = new Promise((resolve8, reject) => {
               googleCredentials.getRequestMetadata(options.service_url, (err, headers) => {
                 if (err) {
                   reject(err);
@@ -7356,7 +7356,7 @@ var require_call_credentials = __commonJS({
                   reject(new Error("Headers not set by metadata plugin"));
                   return;
                 }
-                resolve7(headers);
+                resolve8(headers);
               });
             });
           }
@@ -7409,10 +7409,10 @@ var require_call_credentials = __commonJS({
         this.metadataGenerator = metadataGenerator;
       }
       generateMetadata(options) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           this.metadataGenerator(options, (err, metadata) => {
             if (metadata !== void 0) {
-              resolve7(metadata);
+              resolve8(metadata);
             } else {
               reject(err);
             }
@@ -7771,14 +7771,14 @@ var require_channel_credentials = __commonJS({
       }
       connect(socket) {
         const tlsConnectOptions = Object.assign({ socket }, this.connectionOptions);
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           const tlsSocket = (0, tls_1.connect)(tlsConnectOptions, () => {
             var _a;
             if (((_a = this.connectionOptions.rejectUnauthorized) !== null && _a !== void 0 ? _a : true) && !tlsSocket.authorized) {
               reject(tlsSocket.authorizationError);
               return;
             }
-            resolve7({
+            resolve8({
               socket: tlsSocket,
               secure: true
             });
@@ -7897,8 +7897,8 @@ var require_channel_credentials = __commonJS({
         if (this.hasReceivedUpdates()) {
           return Promise.resolve(this.getLatestSecureContext());
         } else {
-          return new Promise((resolve7) => {
-            this.secureContextWatchers.push(resolve7);
+          return new Promise((resolve8) => {
+            this.secureContextWatchers.push(resolve8);
           });
         }
       }
@@ -7931,7 +7931,7 @@ var require_channel_credentials = __commonJS({
         this.callCredentials = callCredentials;
       }
       connect(socket) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           const secureContext = this.parent.getLatestSecureContext();
           if (!secureContext) {
             reject(new Error("Failed to load credentials"));
@@ -7956,7 +7956,7 @@ var require_channel_credentials = __commonJS({
               reject(tlsSocket.authorizationError);
               return;
             }
-            resolve7({
+            resolve8({
               socket: tlsSocket,
               secure: true
             });
@@ -11532,7 +11532,7 @@ var require_aspromise = __commonJS({
       var params = new Array(arguments.length - 1), offset = 0, index = 2, pending = true;
       while (index < arguments.length)
         params[offset++] = arguments[index++];
-      return new Promise(function executor(resolve7, reject) {
+      return new Promise(function executor(resolve8, reject) {
         params[offset] = function callback(err) {
           if (pending) {
             pending = false;
@@ -11542,7 +11542,7 @@ var require_aspromise = __commonJS({
               var params2 = new Array(arguments.length - 1), offset2 = 0;
               while (offset2 < params2.length)
                 params2[offset2++] = arguments[offset2];
-              resolve7.apply(null, params2);
+              resolve8.apply(null, params2);
             }
           }
         };
@@ -13054,7 +13054,7 @@ var require_path = __commonJS({
         return prefix + parts.join("/");
       }
     );
-    path2.resolve = function resolve7(originPath, includePath, alreadyNormalized) {
+    path2.resolve = function resolve8(originPath, includePath, alreadyNormalized) {
       if (!alreadyNormalized)
         includePath = normalize(includePath);
       if (isAbsolute(includePath))
@@ -13374,7 +13374,7 @@ var require_mapfield = __commonJS({
         keepComments ? this.comment : void 0
       ]);
     };
-    MapField.prototype.resolve = function resolve7() {
+    MapField.prototype.resolve = function resolve8() {
       if (this.resolved)
         return this;
       if (types2.mapKey[this.keyType] === void 0)
@@ -13451,7 +13451,7 @@ var require_method = __commonJS({
         this.parsedOptions
       ]);
     };
-    Method.prototype.resolve = function resolve7() {
+    Method.prototype.resolve = function resolve8() {
       if (this.resolved)
         return this;
       this.resolvedRequestType = this.parent.lookupType(this.requestType);
@@ -15014,7 +15014,7 @@ var require_field = __commonJS({
         keepComments ? this.comment : void 0
       ]);
     };
-    Field.prototype.resolve = function resolve7() {
+    Field.prototype.resolve = function resolve8() {
       if (this.resolved)
         return this;
       if ((this.typeDefault = types2.defaults[this.type]) === void 0) {
@@ -15287,7 +15287,7 @@ var require_object = __commonJS({
       this.parent = null;
       this.resolved = false;
     };
-    ReflectionObject.prototype.resolve = function resolve7() {
+    ReflectionObject.prototype.resolve = function resolve8() {
       if (this.resolved)
         return this;
       if (this.root instanceof Root)
@@ -21188,18 +21188,18 @@ var require_compression_filter = __commonJS({
         this.maxRecvMessageLength = maxRecvMessageLength;
       }
       compressMessage(message) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           zlib.deflate(message, (err, output) => {
             if (err) {
               reject(err);
             } else {
-              resolve7(output);
+              resolve8(output);
             }
           });
         });
       }
       decompressMessage(message) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           let totalLength = 0;
           const messageParts = [];
           const decompresser = zlib.createInflate();
@@ -21215,7 +21215,7 @@ var require_compression_filter = __commonJS({
             }
           });
           decompresser.on("end", () => {
-            resolve7(Buffer.concat(messageParts));
+            resolve8(Buffer.concat(messageParts));
           });
           decompresser.write(message);
           decompresser.end();
@@ -21228,18 +21228,18 @@ var require_compression_filter = __commonJS({
         this.maxRecvMessageLength = maxRecvMessageLength;
       }
       compressMessage(message) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           zlib.gzip(message, (err, output) => {
             if (err) {
               reject(err);
             } else {
-              resolve7(output);
+              resolve8(output);
             }
           });
         });
       }
       decompressMessage(message) {
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           let totalLength = 0;
           const messageParts = [];
           const decompresser = zlib.createGunzip();
@@ -21255,7 +21255,7 @@ var require_compression_filter = __commonJS({
             }
           });
           decompresser.on("end", () => {
-            resolve7(Buffer.concat(messageParts));
+            resolve8(Buffer.concat(messageParts));
           });
           decompresser.write(message);
           decompresser.end();
@@ -22590,7 +22590,7 @@ var require_http_proxy = __commonJS({
       options.headers = headers;
       const proxyAddressString = (0, subchannel_address_1.subchannelAddressToString)(address);
       trace("Using proxy " + proxyAddressString + " to connect to " + options.path);
-      return new Promise((resolve7, reject) => {
+      return new Promise((resolve8, reject) => {
         const request = http.request(options);
         request.once("connect", (res, socket, head) => {
           request.removeAllListeners();
@@ -22601,7 +22601,7 @@ var require_http_proxy = __commonJS({
               socket.unshift(head);
             }
             trace("Successfully established a plaintext connection to " + options.path + " through proxy " + proxyAddressString);
-            resolve7(socket);
+            resolve8(socket);
           } else {
             (0, logging_1.log)(constants_1.LogVerbosity.ERROR, "Failed to connect to " + options.path + " through proxy " + proxyAddressString + " with status " + res.statusCode);
             reject();
@@ -23501,7 +23501,7 @@ var require_transport = __commonJS({
         if (secureConnectResult.socket.closed) {
           return Promise.reject("Connection closed before starting HTTP/2 handshake");
         }
-        return new Promise((resolve7, reject) => {
+        return new Promise((resolve8, reject) => {
           var _a, _b, _c, _d, _e, _f, _g, _h;
           let remoteName = null;
           let realTarget = this.channelTarget;
@@ -23570,7 +23570,7 @@ var require_transport = __commonJS({
             session.removeAllListeners();
             secureConnectResult.socket.removeListener("close", closeHandler);
             secureConnectResult.socket.removeListener("error", errorHandler);
-            resolve7(new Http2Transport(session, address, options, remoteName));
+            resolve8(new Http2Transport(session, address, options, remoteName));
             this.session = null;
           });
           session.once("close", closeHandler);
@@ -23584,7 +23584,7 @@ var require_transport = __commonJS({
           if (proxiedSocket) {
             return proxiedSocket;
           } else {
-            return new Promise((resolve7, reject) => {
+            return new Promise((resolve8, reject) => {
               const closeCallback = () => {
                 reject(new Error("Socket closed"));
               };
@@ -23594,7 +23594,7 @@ var require_transport = __commonJS({
               const socket = net.connect(address, () => {
                 socket.removeListener("close", closeCallback);
                 socket.removeListener("error", errorCallback);
-                resolve7(socket);
+                resolve8(socket);
               });
               socket.once("close", closeCallback);
               socket.once("error", errorCallback);
@@ -26898,7 +26898,7 @@ var require_server_interceptors = __commonJS({
           } else {
             decompresser = zlib.createGunzip();
           }
-          return new Promise((resolve7, reject) => {
+          return new Promise((resolve8, reject) => {
             let totalLength = 0;
             const messageParts = [];
             decompresser.on("data", (chunk) => {
@@ -26913,7 +26913,7 @@ var require_server_interceptors = __commonJS({
               }
             });
             decompresser.on("end", () => {
-              resolve7(Buffer.concat(messageParts));
+              resolve8(Buffer.concat(messageParts));
             });
             decompresser.write(messageContents);
             decompresser.end();
@@ -27503,10 +27503,10 @@ var require_server = __commonJS({
         bindOneAddress(address, boundPortObject) {
           this.trace("Attempting to bind " + (0, subchannel_address_1.subchannelAddressToString)(address));
           const http2Server = this.createHttp2Server(boundPortObject.credentials);
-          return new Promise((resolve7, reject) => {
+          return new Promise((resolve8, reject) => {
             const onError = (err) => {
               this.trace("Failed to bind " + (0, subchannel_address_1.subchannelAddressToString)(address) + " with error " + err.message);
-              resolve7({
+              resolve8({
                 port: "port" in address ? address.port : 1,
                 error: err.message
               });
@@ -27534,7 +27534,7 @@ var require_server = __commonJS({
               });
               boundPortObject.listeningServers.add(http2Server);
               this.trace("Successfully bound " + (0, subchannel_address_1.subchannelAddressToString)(boundSubchannelAddress));
-              resolve7({
+              resolve8({
                 port: "port" in boundSubchannelAddress ? boundSubchannelAddress.port : 1
               });
               http2Server.removeListener("error", onError);
@@ -27587,7 +27587,7 @@ var require_server = __commonJS({
           }
         }
         resolvePort(port) {
-          return new Promise((resolve7, reject) => {
+          return new Promise((resolve8, reject) => {
             let seenResolution = false;
             const resolverListener = (endpointList, attributes, serviceConfig, resolutionNote) => {
               if (seenResolution) {
@@ -27603,7 +27603,7 @@ var require_server = __commonJS({
                 reject(new Error(`No addresses resolved for port ${port}`));
                 return true;
               }
-              resolve7(addressList);
+              resolve8(addressList);
               return true;
             };
             const resolver = (0, resolver_1.createResolver)(port, resolverListener, this.options);
@@ -40916,7 +40916,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
+        await new Promise((resolve8) => setTimeout(resolve8, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error2) {
@@ -40933,7 +40933,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       const earlyReject = (error2) => {
         reject(error2);
       };
@@ -41011,7 +41011,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve7(parseResult.data);
+            resolve8(parseResult.data);
           }
         } catch (error2) {
           reject(error2);
@@ -41272,12 +41272,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve7, interval);
+      const timeoutId = setTimeout(resolve8, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -42147,12 +42147,12 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve7) => {
+    return new Promise((resolve8) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve7();
+        resolve8();
       } else {
-        this._stdout.once("drain", resolve7);
+        this._stdout.once("drain", resolve8);
       }
     });
   }
@@ -42240,11 +42240,11 @@ var DispatchClient = class {
     for (let attempt = 0; attempt < 2; attempt++) {
       const metadata = await this._buildMetadata();
       try {
-        return await new Promise((resolve7, reject) => {
+        return await new Promise((resolve8, reject) => {
           this.stub[method](
             request,
             metadata,
-            (err, res) => err ? reject(err) : resolve7(res)
+            (err, res) => err ? reject(err) : resolve8(res)
           );
         });
       } catch (err) {
@@ -42278,11 +42278,11 @@ function callToAsyncIterator(call) {
       const queue = [];
       let done = false;
       let error2 = null;
-      let resolve7 = null;
+      let resolve8 = null;
       call.on("data", (chunk) => {
-        if (resolve7) {
-          const r = resolve7;
-          resolve7 = null;
+        if (resolve8) {
+          const r = resolve8;
+          resolve8 = null;
           r({ value: chunk, done: false });
         } else {
           queue.push(chunk);
@@ -42290,17 +42290,17 @@ function callToAsyncIterator(call) {
       });
       call.on("end", () => {
         done = true;
-        if (resolve7) {
-          const r = resolve7;
-          resolve7 = null;
+        if (resolve8) {
+          const r = resolve8;
+          resolve8 = null;
           r({ value: void 0, done: true });
         }
       });
       call.on("error", (err) => {
         error2 = err;
-        if (resolve7) {
-          const r = resolve7;
-          resolve7 = null;
+        if (resolve8) {
+          const r = resolve8;
+          resolve8 = null;
           r(Promise.reject(err));
         }
       });
@@ -42314,7 +42314,7 @@ function callToAsyncIterator(call) {
             return Promise.resolve({ value: void 0, done: true });
           }
           return new Promise((res) => {
-            resolve7 = res;
+            resolve8 = res;
           });
         }
       };
@@ -46273,6 +46273,11 @@ async function handleDeployAgent(config2, toolArgs) {
   }
 }
 
+// src/mcp-server/auth/auth-tool.mjs
+import { randomBytes as randomBytes2 } from "node:crypto";
+import { readFileSync as readFileSync8, writeFileSync as writeFileSync5 } from "node:fs";
+import { resolve as resolve7 } from "node:path";
+
 // src/mcp-server/auth/login-flow.mjs
 import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
@@ -46320,7 +46325,7 @@ async function runLoginFlow(options = {}) {
   const port = options.port ?? LOOPBACK_PORT;
   const nonce = randomBytes(16).toString("hex");
   const authUrl = buildAuthUrl(nonce);
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve8, reject) => {
     let settled = false;
     const settle = (fn, value) => {
       if (settled) return;
@@ -46394,7 +46399,7 @@ async function runLoginFlow(options = {}) {
           "Content-Type": "application/json"
         });
         res.end(JSON.stringify({ ok: true }));
-        settle(resolve7, {
+        settle(resolve8, {
           access_token: parsed.access_token,
           refresh_token: parsed.refresh_token,
           expires_at: parsed.expires_at,
@@ -46505,6 +46510,37 @@ function handleStatus() {
     ].join("\n")
   );
 }
+function handleGenerateToken() {
+  const token = "swarp_" + randomBytes2(24).toString("hex");
+  const configPath = resolve7(".swarp.json");
+  try {
+    const raw = readFileSync8(configPath, "utf-8");
+    const config2 = JSON.parse(raw);
+    config2.auth_token = token;
+    writeFileSync5(configPath, JSON.stringify(config2, null, 2) + "\n", "utf-8");
+  } catch (err) {
+    return errorContent(`Failed to update .swarp.json: ${err.message}`);
+  }
+  const flyApp = (() => {
+    try {
+      const raw = readFileSync8(configPath, "utf-8");
+      return JSON.parse(raw).fly_app ?? "swarp-router";
+    } catch {
+      return "swarp-router";
+    }
+  })();
+  return textContent(
+    [
+      "Auth token generated and saved to .swarp.json.",
+      "",
+      "Next step \u2014 push it to the router:",
+      "",
+      `  fly secrets set SWARP_AUTH_TOKEN="${token}" -a ${flyApp}`,
+      "",
+      "Then restart Claude Code. The MCP server will use this token automatically."
+    ].join("\n")
+  );
+}
 async function handleAuth(toolArgs) {
   const action = toolArgs?.action ?? "status";
   switch (action) {
@@ -46514,21 +46550,23 @@ async function handleAuth(toolArgs) {
       return handleLogout();
     case "status":
       return handleStatus();
+    case "generate-token":
+      return handleGenerateToken();
     default:
       return errorContent(
-        `Unknown action: ${action}. Valid actions: login, logout, status.`
+        `Unknown action: ${action}. Valid actions: login, logout, status, generate-token.`
       );
   }
 }
 var authToolDef = {
   name: "swarp_auth",
-  description: 'Manage swarp.dev authentication. action="login" opens a browser for Google sign-in (call this when other tools return "not authenticated"). action="logout" clears the local session. action="status" shows who you are signed in as.',
+  description: 'Manage SWARP authentication. action="generate-token" creates a static API token (saves to .swarp.json, prints fly secrets command). action="login" opens browser for OAuth sign-in. action="logout" clears the OAuth session. action="status" shows current auth state.',
   inputSchema: {
     type: "object",
     properties: {
       action: {
         type: "string",
-        enum: ["login", "logout", "status"],
+        enum: ["login", "logout", "status", "generate-token"],
         description: "Action to perform. Default: status."
       }
     }
@@ -46595,6 +46633,15 @@ async function handlePushUpdate(client, toolArgs) {
 
 // src/mcp-server/index.mjs
 var tokenCache = new TokenCache();
+function buildTokenProvider(config2) {
+  const staticToken = config2.auth_token || process.env.SWARP_AUTH_TOKEN;
+  if (staticToken) {
+    console.error("[swarp] Using static auth token");
+    return () => Promise.resolve(staticToken);
+  }
+  console.error("[swarp] Using OAuth token provider");
+  return () => tokenCache.get();
+}
 function notAuthenticatedResponse(err) {
   return {
     content: [{
@@ -46639,7 +46686,7 @@ async function startMcpServer() {
   if (config2.router_url) {
     try {
       client = new DispatchClient(config2.router_url, {
-        tokenProvider: () => tokenCache.get()
+        tokenProvider: buildTokenProvider(config2)
       });
     } catch (err) {
       console.error(
@@ -46654,26 +46701,11 @@ async function startMcpServer() {
   );
   const cache = client ? new AgentCache(client) : null;
   if (cache) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await cache.refresh();
-        break;
-      } catch (err) {
-        if (attempt === 0 && err instanceof NotAuthenticatedError) {
-          console.error("[swarp] Auth expired \u2014 opening browser login...");
-          try {
-            await runLoginFlow();
-            tokenCache.invalidate();
-            continue;
-          } catch (loginErr) {
-            console.error(`[swarp] Login failed: ${loginErr.message}`);
-          }
-        }
-        const reason = err instanceof NotAuthenticatedError ? "not authenticated (login failed or was dismissed)" : err.message;
-        console.error(
-          `[swarp] Warning: could not list agents at ${config2.router_url}: ${reason}`
-        );
-      }
+    try {
+      await cache.refresh();
+    } catch (err) {
+      const reason = err instanceof NotAuthenticatedError ? 'not authenticated \u2014 run swarp_auth action="login"' : err.message;
+      console.error(`[swarp] Could not list agents on startup: ${reason}`);
     }
   }
   async function refreshAndNotify() {
@@ -46692,14 +46724,26 @@ async function startMcpServer() {
   const onboardingTools = [authToolDef, onboardToolDef, deployRouterToolDef];
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     const tools = [...onboardingTools, ...localTools];
-    const agents = cache?.agents ?? [];
-    if (agents.length > 0) tools.push(buildDispatchTool(agents));
+    if (cache) {
+      const agents = cache.agents;
+      tools.push(agents.length > 0 ? buildDispatchTool(agents) : buildDispatchPlaceholder());
+    }
     return { tools };
   });
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const { name, arguments: toolArgs } = req.params;
     if (name === "agent_dispatch") {
-      if (cache && cache.agents.length === 0) await refreshAndNotify();
+      if (cache && cache.agents.length === 0) {
+        try {
+          const changed = await cache.refresh();
+          if (changed) {
+            await server.notification({ method: "notifications/tools/list_changed" });
+          }
+        } catch (err) {
+          if (err instanceof NotAuthenticatedError) return notAuthenticatedResponse(err);
+          console.error(`[swarp] Agent refresh failed: ${err.message}`);
+        }
+      }
       const agents = cache?.agents ?? [];
       const agentName = toolArgs?.agent;
       const known = agents.find((a) => a.name === agentName);
@@ -46712,7 +46756,13 @@ async function startMcpServer() {
       }
       return handleAgentDispatch(client, agentName, toolArgs);
     }
-    if (name === "swarp_auth") return handleAuth(toolArgs);
+    if (name === "swarp_auth") {
+      const result = await handleAuth(toolArgs);
+      if (toolArgs?.action === "login" && !result.isError) {
+        await refreshAndNotify();
+      }
+      return result;
+    }
     if (name === "swarp_onboard") return handleOnboard(toolArgs);
     if (name === "swarp_deploy_router") return handleDeployRouter(toolArgs);
     if (name === "swarp_audit") return handleAudit(config2, toolArgs);
@@ -46753,6 +46803,35 @@ function buildDispatchTool(agents) {
         agent: {
           type: "string",
           description: `Agent name. One of: ${agents.map((a) => a.name).join(", ")}`
+        },
+        mode: {
+          type: "string",
+          description: "Mode to run (e.g. write, review, chat). Defaults to chat.",
+          default: "chat"
+        },
+        context: {
+          type: "string",
+          description: "Free-text input for the agent"
+        },
+        session_id: {
+          type: "string",
+          description: "Optional session ID to continue an existing conversation"
+        }
+      },
+      required: ["agent", "context"]
+    }
+  };
+}
+function buildDispatchPlaceholder() {
+  return {
+    name: "agent_dispatch",
+    description: 'Dispatch a task to a SWARP agent.\n\nNo agents discovered yet. Calling this tool will attempt agent discovery. If not authenticated, run swarp_auth action="login" first.',
+    inputSchema: {
+      type: "object",
+      properties: {
+        agent: {
+          type: "string",
+          description: "Agent name"
         },
         mode: {
           type: "string",
