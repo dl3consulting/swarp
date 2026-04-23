@@ -45901,10 +45901,10 @@ var deployRouterToolDef = {
 };
 
 // src/mcp-server/deploy-agent.mjs
-import { readFileSync as readFileSync7, existsSync as existsSync8 } from "node:fs";
+import { readFileSync as readFileSync7, existsSync as existsSync8, writeFileSync as writeFileSync5 } from "node:fs";
 import { resolve as resolve6, join as join5 } from "node:path";
 import { execFileSync as execFileSync3 } from "node:child_process";
-import { homedir as homedir2 } from "node:os";
+import { homedir as homedir2, tmpdir as tmpdir2 } from "node:os";
 var deployAgentToolDef = {
   name: "swarp_deploy",
   description: "Deploy an agent sprite. Creates the sprite, injects secrets, clones repos, configures Claude auth, installs plugins, pushes skills, and checkpoints. Idempotent \u2014 safe to re-run. Requires SWARP_SPRITES_TOKEN env var.",
@@ -46043,6 +46043,61 @@ async function installClaudeCreds({ sprite: sprite2, spriteExec: spriteExec2, ag
   steps.push("  \u2713 Claude credentials written");
   return steps;
 }
+function defaultExecFlyctl(args, opts = {}) {
+  return execFileSync3("flyctl", args, { encoding: "utf-8", timeout: 3e4, ...opts });
+}
+async function installWireGuard({
+  agentName,
+  sprite: spriteFn,
+  spriteExec: spriteExecFn,
+  flyOrg,
+  flyRegion = "dfw",
+  execFlyctl = defaultExecFlyctl
+}) {
+  const steps = [];
+  steps.push("\u2192 Setting up WireGuard tunnel...");
+  try {
+    const addrs = spriteExecFn(agentName, ["ip", "-6", "addr", "show", "dev", "wg0"], { timeout: 15e3 }).toString("utf-8");
+    if (addrs.includes("fdaa:")) {
+      steps.push("  \u21BB WireGuard tunnel already up \u2014 skipping");
+      return steps;
+    }
+  } catch {
+  }
+  try {
+    spriteExecFn(agentName, ["which", "wg-quick"], { timeout: 15e3 });
+  } catch {
+    spriteExecFn(agentName, [
+      "sudo",
+      "bash",
+      "-c",
+      "apt-get update -qq && apt-get install -y -qq wireguard-tools"
+    ], { timeout: 12e4 });
+    steps.push("  \u2713 wireguard-tools installed");
+  }
+  const confPath = join5(tmpdir2(), `${agentName}-wg-${Date.now()}.conf`);
+  execFlyctl(["wireguard", "create", flyOrg, flyRegion, agentName, confPath]);
+  steps.push(`  \u2713 WireGuard peer created in ${flyRegion}`);
+  let conf = readFileSync7(confPath, "utf-8");
+  conf = conf.split("\n").filter((l) => !l.trim().startsWith("DNS")).join("\n");
+  if (!conf.includes("PersistentKeepalive")) {
+    conf = conf.replace(/(\[Peer\])/, "$1\nPersistentKeepalive = 25");
+  }
+  spriteFn(
+    [
+      "exec",
+      "--sprite",
+      agentName,
+      "--",
+      "bash",
+      "-c",
+      "mkdir -p /etc/wireguard && cat > /etc/wireguard/wg0.conf && chmod 600 /etc/wireguard/wg0.conf && wg-quick up wg0"
+    ],
+    { input: conf, timeout: 3e4 }
+  );
+  steps.push("  \u2713 WireGuard tunnel established");
+  return steps;
+}
 function spriteExists(name) {
   try {
     const output = sprite(["list"], { timeout: 15e3 }).toString("utf-8");
@@ -46086,10 +46141,10 @@ async function handleDeployAgent(config2, toolArgs) {
       };
     }
     steps.push("  \u2713 .gitignore protects agents/**/.env");
-    const token = process.env.SWARP_SPRITES_TOKEN;
+    const token = config2.sprites_token || process.env.SWARP_SPRITES_TOKEN;
     if (!token) {
       return {
-        content: [{ type: "text", text: "Error: SWARP_SPRITES_TOKEN env var is required" }],
+        content: [{ type: "text", text: "Error: sprites_token not found in .swarp.json and SWARP_SPRITES_TOKEN env var not set" }],
         isError: true
       };
     }
@@ -46115,7 +46170,8 @@ async function handleDeployAgent(config2, toolArgs) {
         isError: true
       };
     }
-    const agentConfig = jsYaml.load(readFileSync7(yamlPath, "utf-8"));
+    const agentYaml = readFileSync7(yamlPath, "utf-8");
+    const agentConfig = jsYaml.load(agentYaml);
     const envEntries = parseEnvFile(envPath);
     steps.push(`  \u2713 Validated inputs for agent "${agentName}"`);
     const exists = spriteExists(agentName);
@@ -46125,6 +46181,24 @@ async function handleDeployAgent(config2, toolArgs) {
       steps.push(`\u2192 Creating sprite "${agentName}"...`);
       sprite(["create", agentName], { timeout: 6e4 });
       steps.push("  \u2713 Sprite created");
+    }
+    sprite(
+      ["exec", "--sprite", agentName, "--", "tee", "/home/sprite/agent.yaml"],
+      { input: agentYaml, timeout: 15e3 }
+    );
+    steps.push("  \u2713 agent.yaml pushed to sprite");
+    const flyOrg = config2.fly_org || process.env.FLY_ORG;
+    if (flyOrg) {
+      const wgSteps = await installWireGuard({
+        agentName,
+        sprite,
+        spriteExec,
+        flyOrg,
+        flyRegion: config2.fly_region || process.env.FLY_REGION || "dfw"
+      });
+      steps.push(...wgSteps);
+    } else {
+      steps.push("  \u26A0 fly_org not configured \u2014 skipping WireGuard setup");
     }
     steps.push("\u2192 Injecting secrets...");
     for (const [key, value] of envEntries) {
@@ -46274,7 +46348,7 @@ async function handleDeployAgent(config2, toolArgs) {
 
 // src/mcp-server/auth/auth-tool.mjs
 import { randomBytes as randomBytes2 } from "node:crypto";
-import { readFileSync as readFileSync8, writeFileSync as writeFileSync5 } from "node:fs";
+import { readFileSync as readFileSync8, writeFileSync as writeFileSync6 } from "node:fs";
 import { resolve as resolve7 } from "node:path";
 
 // src/mcp-server/auth/login-flow.mjs
@@ -46516,7 +46590,7 @@ function handleGenerateToken() {
     const raw = readFileSync8(configPath, "utf-8");
     const config2 = JSON.parse(raw);
     config2.auth_token = token;
-    writeFileSync5(configPath, JSON.stringify(config2, null, 2) + "\n", "utf-8");
+    writeFileSync6(configPath, JSON.stringify(config2, null, 2) + "\n", "utf-8");
   } catch (err) {
     return errorContent(`Failed to update .swarp.json: ${err.message}`);
   }
@@ -46732,20 +46806,22 @@ async function startMcpServer() {
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const { name, arguments: toolArgs } = req.params;
     if (name === "agent_dispatch") {
-      if (cache && cache.agents.length === 0) {
+      const agentName = toolArgs?.agent;
+      let agents = cache?.agents ?? [];
+      let known = agents.find((a) => a.name === agentName);
+      if (!known && cache) {
         try {
           const changed = await cache.refresh();
           if (changed) {
             await server.notification({ method: "notifications/tools/list_changed" });
           }
+          agents = cache.agents;
+          known = agents.find((a) => a.name === agentName);
         } catch (err) {
           if (err instanceof NotAuthenticatedError) return notAuthenticatedResponse(err);
           console.error(`[swarp] Agent refresh failed: ${err.message}`);
         }
       }
-      const agents = cache?.agents ?? [];
-      const agentName = toolArgs?.agent;
-      const known = agents.find((a) => a.name === agentName);
       if (!known) {
         const available = agents.map((a) => a.name).join(", ") || "none";
         return {
@@ -46766,7 +46842,11 @@ async function startMcpServer() {
     if (name === "swarp_deploy_router") return handleDeployRouter(toolArgs);
     if (name === "swarp_audit") return handleAudit(config2, toolArgs);
     if (name === "swarp_generate") return handleGenerate(config2, toolArgs);
-    if (name === "swarp_status") return handleStatus2(client, toolArgs);
+    if (name === "swarp_status") {
+      const result = await handleStatus2(client, toolArgs);
+      await refreshAndNotify();
+      return result;
+    }
     if (name === "swarp_deploy") {
       const result = await handleDeployAgent(config2, toolArgs);
       await refreshAndNotify();
