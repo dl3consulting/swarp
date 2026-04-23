@@ -46254,7 +46254,7 @@ async function handleDeployAgent(config2, toolArgs) {
         if (checkOutput === "exists") {
           steps.push(`  \u21BB ${repoPath} already exists \u2014 skipping clone`);
         } else {
-          spriteExec(agentName, ["git", "clone", url, repoPath], { timeout: 12e4 });
+          spriteExec(agentName, ["bash", "-c", `git clone ${url} ${repoPath}`], { timeout: 12e4 });
           steps.push(`  \u2713 Cloned ${url} \u2192 ${repoPath}`);
         }
       }
@@ -46291,17 +46291,20 @@ async function handleDeployAgent(config2, toolArgs) {
     const skills = env.skills ?? [];
     if (skills.length > 0) {
       steps.push("\u2192 Pushing skills...");
-      const skillsBase = join5(homedir2(), ".claude", "skills");
+      const userSkillsDir = join5(homedir2(), ".claude", "skills");
+      const projectSkillsDir = join5(resolve6(config2.agents_dir ?? "agents"), "..", ".claude", "skills");
+      const skillSearchPaths = [userSkillsDir, projectSkillsDir];
       spriteExec(agentName, ["mkdir", "-p", "/home/sprite/.claude/skills/"], { timeout: 15e3 });
       for (const skillName of skills) {
-        const skillHostPath = join5(skillsBase, skillName);
-        if (!existsSync8(skillHostPath)) {
-          steps.push(`  \u26A0 Skill "${skillName}" not found on host at ${skillHostPath} \u2014 skipping`);
+        const foundDir = skillSearchPaths.find((d) => existsSync8(join5(d, skillName)));
+        if (!foundDir) {
+          steps.push(`  \u26A0 Skill "${skillName}" not found in any search path \u2014 skipping`);
           continue;
         }
-        const tarData = execFileSync3("tar", ["-cf", "-", "-C", skillsBase, skillName], {
+        const tarData = execFileSync3("tar", ["-cf", "-", "-C", foundDir, skillName], {
           encoding: "buffer",
-          timeout: 3e4
+          timeout: 3e4,
+          maxBuffer: 10 * 1024 * 1024
         });
         sprite(
           ["exec", "--sprite", agentName, "--", "tar", "-xf", "-", "-C", "/home/sprite/.claude/skills/"],
