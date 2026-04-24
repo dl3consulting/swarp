@@ -42324,6 +42324,7 @@ function callToAsyncIterator(call) {
 // src/config.mjs
 import { readFileSync, existsSync as existsSync2 } from "node:fs";
 import { resolve } from "node:path";
+var SWARP_API_BASE = process.env.SWARP_API_BASE || "https://xzcysgjzygqhfdrriibs.supabase.co";
 function loadConfig(configPath = ".swarp.json") {
   const fullPath = resolve(configPath);
   if (!existsSync2(fullPath)) {
@@ -45507,7 +45508,7 @@ import { join as join4, resolve as resolve5 } from "node:path";
 import { existsSync as existsSync6, mkdirSync, readFileSync as readFileSync5, rmSync, writeFileSync as writeFileSync3 } from "node:fs";
 import { homedir, platform } from "node:os";
 import { join as join3 } from "node:path";
-var SUPABASE_URL = "https://xzcysgjzygqhfdrriibs.supabase.co";
+var SUPABASE_URL = SWARP_API_BASE;
 var SUPABASE_ANON_KEY = "sb_publishable_452Rhf80dEPqM8j9UfMDPg_taW7S543";
 var REFRESH_BUFFER_SECONDS = 5 * 60;
 var NotAuthenticatedError = class extends Error {
@@ -45610,7 +45611,7 @@ async function ensureValidSession() {
 }
 
 // src/mcp-server/deploy-router.mjs
-var DEFAULT_SWARP_API_BASE = "https://xzcysgjzygqhfdrriibs.supabase.co";
+var DEFAULT_SWARP_API_BASE = SWARP_API_BASE;
 var DEFAULT_REGION = "ord";
 var DEFAULT_APP_NAME_PREFIX = "swarp-router";
 var DEFAULT_ROUTER_IMAGE = "ghcr.io/dl3consulting/swarp-router:latest";
@@ -45762,7 +45763,7 @@ Run swarp_auth with action="login" first, then retry swarp_deploy_router.`
     }
     throw err;
   }
-  const routerImage = process.env.SWARP_ROUTER_IMAGE ?? DEFAULT_ROUTER_IMAGE;
+  const routerImage = process.env.SWARP_ROUTER_IMAGE?.trim() || DEFAULT_ROUTER_IMAGE;
   try {
     flyctl(["auth", "whoami"], { timeout: 1e4 });
   } catch {
@@ -45774,7 +45775,7 @@ Run swarp_auth with action="login" first, then retry swarp_deploy_router.`
       isError: true
     };
   }
-  const apiBase = process.env.SWARP_API_BASE ?? DEFAULT_SWARP_API_BASE;
+  const apiBase = process.env.SWARP_API_BASE?.trim() || DEFAULT_SWARP_API_BASE;
   const appName = appNameInput ?? DEFAULT_APP_NAME_PREFIX;
   const configPath = resolve5(".swarp.json");
   const steps = [];
@@ -46800,7 +46801,10 @@ async function startMcpServer() {
     return { tools };
   });
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
-    const { name, arguments: toolArgs } = req.params;
+    const { name, arguments: toolArgs = {} } = req.params;
+    if (typeof toolArgs !== "object" || toolArgs === null) {
+      return { content: [{ type: "text", text: "Invalid arguments: expected object" }], isError: true };
+    }
     if (name === "agent_dispatch") {
       const agentName = toolArgs?.agent;
       let agents = cache?.agents ?? [];
