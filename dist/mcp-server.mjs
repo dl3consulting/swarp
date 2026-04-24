@@ -44962,39 +44962,52 @@ var jsYaml = {
 };
 
 // src/generator/schema.mjs
-var VALID_MODELS = ["haiku", "sonnet", "opus"];
+var VALID_MODELS = [
+  "haiku",
+  "sonnet",
+  "opus",
+  "claude-haiku-4-5-20251001",
+  "claude-sonnet-4-6",
+  "claude-opus-4-6",
+  "claude-opus-4-7"
+];
 var RESERVED_NAMES = ["status", "health", "keepalive", "modes", "task"];
-var BUILTIN_VARS = ["persona", "display_name", "message"];
-var ToolsSchema = external_exports.object({
-  allowed: external_exports.array(external_exports.string()),
-  blocked: external_exports.array(external_exports.string())
-});
+var BUILTIN_VARS = ["content", "persona", "display_name", "message"];
+var HAIKU_MODELS = ["haiku", "claude-haiku-4-5-20251001"];
 var ModeSchema = external_exports.object({
+  name: external_exports.string(),
   description: external_exports.string(),
-  model: external_exports.enum(VALID_MODELS),
+  model: external_exports.string().refine(
+    (v) => VALID_MODELS.includes(v),
+    (v) => ({ message: `Unknown model "${v}". Valid: ${VALID_MODELS.join(", ")}` })
+  ),
   max_turns: external_exports.number().int().positive(),
   timeout_minutes: external_exports.number().positive(),
-  tools: ToolsSchema,
-  input: external_exports.record(external_exports.unknown()),
-  output: external_exports.object({ schema: external_exports.record(external_exports.unknown()).optional() }).optional(),
   prompt: external_exports.string(),
-  skills: external_exports.array(external_exports.string()).optional()
+  allowed_tools: external_exports.array(external_exports.string())
 }).passthrough();
-var PersonaSchema = external_exports.object({
-  role: external_exports.string(),
-  bio: external_exports.string(),
-  avatar: external_exports.string()
+var RepoSchema = external_exports.object({
+  name: external_exports.string(),
+  url: external_exports.string(),
+  path: external_exports.string()
 }).passthrough();
+var EnvSchema = external_exports.object({
+  auth: external_exports.object({ method: external_exports.string() }).passthrough().optional(),
+  repos: external_exports.array(RepoSchema).optional(),
+  secrets: external_exports.array(external_exports.string()).optional(),
+  skills: external_exports.array(external_exports.string()).optional(),
+  network: external_exports.object({ internet: external_exports.boolean() }).passthrough().optional()
+}).passthrough().optional();
 var AgentConfigSchema = external_exports.object({
   name: external_exports.string(),
-  display_name: external_exports.string(),
-  sprite: external_exports.string(),
-  sprite_url: external_exports.string(),
-  region: external_exports.string(),
-  persona: PersonaSchema,
+  version: external_exports.string(),
+  grpc_port: external_exports.number().int().positive(),
+  router_url: external_exports.string(),
   preamble: external_exports.string(),
-  modes: external_exports.record(ModeSchema),
-  skills: external_exports.array(external_exports.string()).optional()
+  modes: external_exports.array(ModeSchema).min(1),
+  avatar_url: external_exports.string().optional(),
+  ack_message: external_exports.string().optional(),
+  env: EnvSchema
 }).passthrough();
 function validateAgentConfig(raw) {
   const zodResult = AgentConfigSchema.safeParse(raw);
@@ -45004,49 +45017,36 @@ function validateAgentConfig(raw) {
       errors.push(`${issue2.path.join(".")}: ${issue2.message}`);
     }
   }
-  if (typeof raw === "object" && raw !== null) {
-    if (raw.modes && typeof raw.modes === "object") {
-      if (!raw.modes.chat) {
-        errors.push("Every agent must have a chat mode");
+  if (typeof raw !== "object" || raw === null || !Array.isArray(raw.modes)) {
+    return errors;
+  }
+  const modeNames = raw.modes.map((m) => m.name);
+  if (!modeNames.includes("chat")) {
+    errors.push("Every agent must have a chat mode");
+  }
+  for (const mode of raw.modes) {
+    const p = `modes[${mode.name}]`;
+    if (RESERVED_NAMES.includes(mode.name)) {
+      errors.push(`${p}: "${mode.name}" is a reserved mode name`);
+    }
+    if (mode.name === "chat") {
+      if (mode.model && !HAIKU_MODELS.includes(mode.model)) {
+        errors.push(`${p}: chat must use haiku, got "${mode.model}"`);
       }
-      for (const [name, mode] of Object.entries(raw.modes)) {
-        const p = `modes.${name}`;
-        if (RESERVED_NAMES.includes(name)) {
-          errors.push(`${p}: "${name}" is a reserved mode name`);
-        }
-        if (name === "chat" && typeof mode === "object" && mode !== null) {
-          if (mode.model && mode.model !== "haiku") {
-            errors.push(`${p}: chat must use haiku, got "${mode.model}"`);
-          }
-          if (mode.max_turns !== void 0 && mode.max_turns !== 1) {
-            errors.push(`${p}: chat must have max_turns: 1, got ${mode.max_turns}`);
-          }
-          if (!mode.input?.message) {
-            errors.push(`${p}: chat must have message input`);
-          }
-          if (mode.tools?.allowed?.length > 0) {
-            errors.push(`${p}: chat must have tools.allowed: [] (no tools)`);
-          }
-        }
-        if (typeof mode === "object" && mode !== null) {
-          const modeSkills = mode.skills || raw.skills || [];
-          if (modeSkills.length > 0 && mode.tools?.allowed && !mode.tools.allowed.includes("Skill")) {
-            errors.push(`${p}: has skills but "Skill" not in tools.allowed`);
-          }
-          if (mode.prompt && mode.input) {
-            const refs = [...mode.prompt.matchAll(/\{\{\s*(\w+)/g)].map((m) => m[1]);
-            const inputs = Object.keys(mode.input);
-            for (const ref of refs) {
-              if (!inputs.includes(ref) && !BUILTIN_VARS.includes(ref)) {
-                errors.push(`${p}: prompt references "{{ ${ref} }}" but no matching input`);
-              }
-            }
-          }
-          if (mode.max_turns > 100) {
-            errors.push(`${p}: max_turns=${mode.max_turns} seems excessive (>100)`);
-          }
+      if (mode.allowed_tools?.length > 0) {
+        errors.push(`${p}: chat must have allowed_tools: [] (no tools)`);
+      }
+    }
+    if (mode.prompt) {
+      const refs = [...mode.prompt.matchAll(/\{\{\s*(\w+)/g)].map((m) => m[1]);
+      for (const ref of refs) {
+        if (!BUILTIN_VARS.includes(ref)) {
+          errors.push(`${p}: prompt references "{{ ${ref} }}" which is not a builtin variable (${BUILTIN_VARS.join(", ")})`);
         }
       }
+    }
+    if (mode.max_turns > 100) {
+      errors.push(`${p}: max_turns=${mode.max_turns} seems excessive (>100)`);
     }
   }
   return errors;
@@ -45091,49 +45091,33 @@ function auditAgent(agent, options = {}) {
       message: `Directory "${dirName}" doesn't match agent name "${config2.name}"`
     });
   }
-  if (config2.persona?.avatar) {
-    const exists = existsSync3(join(dir, config2.persona.avatar));
-    checks.push({
-      name: "avatar_exists",
-      severity: "warning",
-      status: exists ? "pass" : "fail",
-      message: exists ? "Avatar found" : `Avatar missing: ${config2.persona.avatar}`
-    });
-  }
-  for (const [modeName, mode] of Object.entries(config2.modes || {})) {
-    if (mode.prompt && mode.input) {
+  const modes = Array.isArray(config2.modes) ? config2.modes : [];
+  const haiku = ["haiku", "claude-haiku-4-5-20251001"];
+  const agentSkills = config2.env?.skills || [];
+  for (const mode of modes) {
+    const modeName = mode.name;
+    if (!modeName) continue;
+    if (mode.prompt) {
+      const builtins = ["content", "persona", "display_name", "message"];
       const refs = [...mode.prompt.matchAll(/\{\{\s*(\w+)/g)].map((m) => m[1]);
-      const inputs = Object.keys(mode.input);
-      const builtins = ["persona", "display_name", "message"];
-      const missing = refs.filter((r) => !inputs.includes(r) && !builtins.includes(r));
+      const unknown2 = refs.filter((r) => !builtins.includes(r));
       checks.push({
         name: `prompt_refs_${modeName}`,
         severity: "error",
-        status: missing.length === 0 ? "pass" : "fail",
-        message: missing.length === 0 ? `${modeName}: prompt refs valid` : `${modeName}: undefined refs: ${missing.join(", ")}`
+        status: unknown2.length === 0 ? "pass" : "fail",
+        message: unknown2.length === 0 ? `${modeName}: prompt refs valid` : `${modeName}: unknown template vars: ${unknown2.join(", ")}`
       });
     }
-    if (mode.prompt && mode.output?.schema) {
-      const keys = Object.keys(mode.output.schema);
-      const missing = keys.filter((k) => !mode.prompt.includes(k));
-      checks.push({
-        name: `output_schema_${modeName}`,
-        severity: "warning",
-        status: missing.length === 0 ? "pass" : "fail",
-        message: missing.length === 0 ? `${modeName}: output keys in prompt` : `${modeName}: keys missing from prompt: ${missing.join(", ")}`
-      });
-    }
-    const modeSkills = mode.skills || config2.skills || [];
-    if (modeSkills.length > 0) {
-      const hasSkill = mode.tools?.allowed?.includes("Skill");
+    if (agentSkills.length > 0 && modeName !== "chat") {
+      const hasSkill = mode.allowed_tools?.includes("Skill");
       checks.push({
         name: `skill_access_${modeName}`,
-        severity: "error",
+        severity: "warning",
         status: hasSkill ? "pass" : "fail",
-        message: hasSkill ? `${modeName}: Skill in allowedTools` : `${modeName}: has skills but Skill not in allowedTools`
+        message: hasSkill ? `${modeName}: Skill in allowed_tools` : `${modeName}: agent has skills but Skill not in allowed_tools`
       });
     }
-    if (modeName === "chat" && mode.model !== "haiku") {
+    if (modeName === "chat" && !haiku.includes(mode.model)) {
       checks.push({
         name: `budget_${modeName}`,
         severity: "warning",
@@ -46649,6 +46633,11 @@ var authToolDef = {
   }
 };
 
+// src/mcp-server/index.mjs
+import { readFileSync as readFileSync9 } from "node:fs";
+import { fileURLToPath as fileURLToPath2 } from "node:url";
+import { dirname, join as join6 } from "node:path";
+
 // src/mcp-server/auth/token-client.mjs
 var TokenCache = class {
   async get() {
@@ -46708,6 +46697,10 @@ async function handlePushUpdate(client, toolArgs) {
 }
 
 // src/mcp-server/index.mjs
+var __dirname2 = dirname(fileURLToPath2(import.meta.url));
+var { version: PKG_VERSION } = JSON.parse(
+  readFileSync9(join6(__dirname2, "../../package.json"), "utf-8")
+);
 var tokenCache = new TokenCache();
 function buildTokenProvider(config2) {
   const staticToken = config2.auth_token || process.env.SWARP_AUTH_TOKEN;
@@ -46772,7 +46765,7 @@ async function startMcpServer() {
     }
   }
   const server = new Server(
-    { name: "swarp", version: "1.0.0" },
+    { name: "swarp", version: PKG_VERSION },
     { capabilities: { tools: {} } }
   );
   const cache = client ? new AgentCache(client) : null;
