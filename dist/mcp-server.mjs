@@ -42182,7 +42182,8 @@ var LOADER_OPTIONS = {
   defaults: true,
   oneofs: true
 };
-function normalizeRouterTarget(raw) {
+function normalizeRouterTarget(target) {
+  const raw = target;
   if (!raw) return raw;
   if (/^[a-z]+:\/\//i.test(raw)) {
     const u = new URL(raw);
@@ -42213,6 +42214,9 @@ var DispatchClient = class {
   /**
    * Build a Metadata object populated with the current install token
    * (if a tokenProvider is configured). Called before every RPC.
+   *
+   * @returns {Promise<grpc.Metadata>} Metadata with authorization header set,
+   *   or empty Metadata when no tokenProvider is configured.
    */
   async _buildMetadata() {
     const metadata = new grpc.Metadata();
@@ -42222,6 +42226,16 @@ var DispatchClient = class {
     }
     return metadata;
   }
+  /**
+   * Dispatch a task to a named agent and stream back agent events.
+   *
+   * @param {string} agent - Name of the target agent.
+   * @param {object} dispatch - Dispatch payload; either `{ raw_text: string }`
+   *   for plain-text input or `{ structured: object }` for structured input.
+   * @param {string} [sessionId=''] - Session ID for multi-turn context continuity.
+   * @returns {AsyncGenerator<object>} Async iterator of AgentEvent objects
+   *   streamed from the router until the task completes or errors.
+   */
   async *dispatchTask(agent, dispatch, sessionId = "") {
     const request = { agent, session_id: sessionId };
     if (dispatch.structured) {
@@ -42255,18 +42269,46 @@ var DispatchClient = class {
       }
     }
   }
+  /**
+   * List all agents currently registered with the router.
+   *
+   * @returns {Promise<object>} ListAgentsResponse containing agent descriptors.
+   */
   async listAgents() {
     return this._unaryWithRetry("ListAgents", {});
   }
+  /**
+   * Cancel a running task by its task ID.
+   *
+   * @param {string} taskId - The task ID to cancel.
+   * @returns {Promise<object>} CancelTaskResponse from the router.
+   */
   async cancelTask(taskId) {
     return this._unaryWithRetry("CancelTask", { task_id: taskId });
   }
+  /**
+   * Get the current status of a named agent.
+   *
+   * @param {string} agent - Name of the agent to query.
+   * @returns {Promise<object>} GetAgentStatusResponse with connection and task state.
+   */
   async getAgentStatus(agent) {
     return this._unaryWithRetry("GetAgentStatus", { agent });
   }
+  /**
+   * Push a restart signal to a named agent.
+   *
+   * @param {object} [options={}]
+   * @param {string} [options.agent=''] - Agent to restart; empty string targets all agents.
+   * @param {string} [options.reason=''] - Human-readable reason for the restart.
+   * @returns {Promise<object>} PushRestartResponse from the router.
+   */
   async pushRestart({ agent = "", reason = "" } = {}) {
     return this._unaryWithRetry("PushRestart", { agent, reason });
   }
+  /**
+   * Close the underlying gRPC channel, releasing all resources.
+   */
   close() {
     this.stub.close();
   }
