@@ -1,7 +1,7 @@
 syntax = "proto3";
 package swarp.v1;
 
-option go_package = "github.com/dl3consulting/swarp/gen/go/swarp/v1;swarpv1";
+option go_package = "github.com/dl3consulting/swarp-proto/swarp/v1;swarpv1";
 
 // Runner -> Router registration and dispatch stream
 service AgentRegistryService {
