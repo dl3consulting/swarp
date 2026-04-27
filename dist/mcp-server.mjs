@@ -46913,11 +46913,12 @@ function buildDispatchTool(agents) {
       if (m.description) return `${m.name} (${m.description})`;
       return m.name;
     }).join(", ");
-    return `- ${a.name} (${a.role ?? "agent"}): ${modes || "chat"}`;
+    const statusLabel = a.status && a.status !== "active" ? ` [${a.status}]` : "";
+    return `- ${a.name}${statusLabel} (${a.role ?? "agent"}): ${modes || "chat"}`;
   });
   return {
     name: "agent_dispatch",
-    description: "Dispatch a task to a SWARP agent.\n\nAgents online:\n" + agentLines.join("\n"),
+    description: "Dispatch a task to a SWARP agent.\n\nAgents:\n" + agentLines.join("\n"),
     inputSchema: {
       type: "object",
       properties: {
@@ -47089,15 +47090,16 @@ async function handleStatus2(client, toolArgs) {
     const { agents } = await client.listAgents();
     const list = agents ?? [];
     if (list.length === 0) {
-      return { content: [{ type: "text", text: "No agents connected" }] };
+      return { content: [{ type: "text", text: "No agents registered" }] };
     }
     const lines = list.map((a) => {
-      const status2 = a.online ? "\u{1F7E2} online" : "\u{1F534} offline";
+      const icon = a.online ? "\u{1F7E2}" : a.status === "offline" ? "\u{1F534}" : "\u{1F7E1}";
+      const label = a.status || (a.online ? "active" : "offline");
       const modes = (a.modes ?? []).map((m) => {
         if (m.description) return `  - ${m.name}: ${m.description}`;
         return `  - ${m.name}`;
       });
-      return [`${a.name} (${status2})`, ...modes].join("\n");
+      return [`${a.name} (${icon} ${label})`, ...modes].join("\n");
     });
     return { content: [{ type: "text", text: lines.join("\n\n") }] };
   } catch (err) {

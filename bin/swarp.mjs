@@ -136,8 +136,9 @@ async function cmdStatus(rest) {
   } else {
     const { agents } = await client.listAgents();
     for (const agent of agents) {
-      const onlineStr = agent.online ? 'online' : 'offline';
-      console.log(`${agent.name} (${onlineStr}) — ${agent.modes?.length ?? 0} mode(s)`);
+      const icon = agent.online ? '🟢' : agent.status === 'offline' ? '🔴' : '🟡';
+      const label = agent.status || (agent.online ? 'active' : 'offline');
+      console.log(`${agent.name} (${icon} ${label}) — ${agent.modes?.length ?? 0} mode(s)`);
     }
   }
 }

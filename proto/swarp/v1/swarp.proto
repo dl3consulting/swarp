@@ -149,6 +149,7 @@ message AgentInfo {
   repeated ModeInfo modes = 4;
   bool online = 5;
   string avatar_url = 6;
+  string status = 7;
 }
 
 message ModeInfo {
