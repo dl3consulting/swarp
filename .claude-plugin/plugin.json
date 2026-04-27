@@ -1,6 +1,6 @@
 {
   "name": "swarp",
-  "version": "0.1.59",
+  "version": "0.1.60",
   "description": "Agent orchestration platform — deploy remote Claude agents",
   "author": {
     "name": "DL3 Consulting",
